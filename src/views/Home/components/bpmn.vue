@@ -9,7 +9,6 @@
 
 <script>
 import BpmnModeler from 'bpmn-js/lib/Modeler';
-
 import {
   BpmnPropertiesPanelModule,
   BpmnPropertiesProviderModule,
