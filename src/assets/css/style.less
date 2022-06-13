@@ -1,0 +1,96 @@
+*{
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-size: 16px;
+}
+img{
+  width: 100%;
+}
+.fixedMune{
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  border-right: 1px solid #e6e6e6;
+  .el-menu{
+    border-right:none ;
+    height: calc(100vh - 60px );
+    .el-menu-item,.el-submenu__title{
+      color: #e6e6e6;
+    }
+  }
+  .logo{
+    padding:10px 15px ;
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    justify-content: center;
+    background-color: #000000;
+    color: white;
+    img{
+      width: 40px;
+      margin-right: 10px;
+    }
+  }
+}
+.el-main{
+  height: calc(100vh - 120px);
+  padding: 20px;
+}
+.el-header{
+  background-color: white;
+  border-bottom: 1px solid #e6e6e6;
+  box-shadow: 0 5px 5px #e6e6e6;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+}
+.el-dropdown-link{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.el-footer{
+  border-top: 1px solid #e6e6e6;
+  padding: 15px 20px;
+  text-align: center;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 -5px 5px #e6e6e6;
+}
+.isCollapse{
+  font-size: 20px;
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  margin-top: -10px;
+}
+#login{
+  background: url(https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F2020-11-05%2F5fa3c986e9290.jpg&refer=http%3A%2F%2Fpic1.win4000.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1657424852&t=4695fa35dd7b148378ab5c10b03b8a92) no-repeat center;
+  background-size: cover;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  .loginForm{
+    position: absolute;
+    padding:80px 30px;
+    width: 600px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #dedede;
+    background-color: rgba(0,0,0, 0.3);
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,.3);
+  }
+  .el-form-item__label{
+    color: white;
+  }
+}
