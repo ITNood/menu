@@ -6,7 +6,7 @@
           <el-input placeholder="请输入账号" v-model="loginForm.username"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input placeholder="请输入账号" v-model="loginForm.password"></el-input>
+          <el-input placeholder="请输入账号" type="password" v-model="loginForm.password"></el-input>
         </el-form-item>
         <el-row>
           <el-col :offset="10">
@@ -38,8 +38,8 @@ export default {
       const info = '498498484';
       localStorage.setItem('userInfo', JSON.stringify(info));
       setTimeout(() => {
-        this.$router.push('/home');
         this.loading = false;
+        this.$router.push('/home');
       }, 1000);
     },
   },
