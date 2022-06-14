@@ -9,7 +9,8 @@
 
 <script>
 import BpmnModeler from 'bpmn-js/lib/Modeler';
-import CustomTranslation from '../js/customTranslate';
+import customTranslate from '../js/customTranslate';
+import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 import {
   BpmnPropertiesPanelModule,
   BpmnPropertiesProviderModule,
@@ -22,6 +23,9 @@ export default {
       containerEl: null,
       bpmnModeler: null,
       fileList: [],
+      customTranslateModule: {
+        translate: ['value', customTranslate],
+      },
     };
   },
   created() {},
@@ -38,9 +42,11 @@ export default {
         additionalModules: [
           BpmnPropertiesPanelModule,
           BpmnPropertiesProviderModule,
-          CustomTranslation, //汉化
-          // PrefabricationPaletteProviderModule
+          this.customTranslateModule, //汉化
         ],
+        moddleExtensions: {
+          camunda: camundaModdleDescriptor,
+        },
       });
       this.bpmnModeler.createDiagram();
     },

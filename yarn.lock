@@ -2479,7 +2479,7 @@ camelcase@^6.0.0:
 
 camunda-bpmn-moddle@^6.1.2:
   version "6.1.2"
-  resolved "https://registry.npmjs.org/camunda-bpmn-moddle/-/camunda-bpmn-moddle-6.1.2.tgz"
+  resolved "https://registry.yarnpkg.com/camunda-bpmn-moddle/-/camunda-bpmn-moddle-6.1.2.tgz#b9b9f77b2981745f26b72a9f0267ea7115cc13d0"
   integrity sha512-DfhOTeq8oN01cB5sLE6Rq34/9xGD15/Y14pEM+YBIjgvV6Rclh+BgIa/2aRMm8An4Kc/itm2tECYiDr8p/FyTQ==
   dependencies:
     min-dash "^3.8.1"
