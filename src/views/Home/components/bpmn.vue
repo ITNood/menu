@@ -9,6 +9,7 @@
 
 <script>
 import BpmnModeler from 'bpmn-js/lib/Modeler';
+import CustomTranslation from '../js/customTranslate';
 import {
   BpmnPropertiesPanelModule,
   BpmnPropertiesProviderModule,
@@ -37,9 +38,11 @@ export default {
         additionalModules: [
           BpmnPropertiesPanelModule,
           BpmnPropertiesProviderModule,
+          CustomTranslation, //汉化
           // PrefabricationPaletteProviderModule
         ],
       });
+      this.bpmnModeler.createDiagram();
     },
   },
 };

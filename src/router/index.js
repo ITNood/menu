@@ -9,7 +9,8 @@ const routes = [
     path: '/',
     redirect: '/home',
     component: Layout,
-    children: [//出现在导航栏的菜单
+    children: [
+      //出现在导航栏的菜单
       {
         path: '/home',
         name: 'home',
