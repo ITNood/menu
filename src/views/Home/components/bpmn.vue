@@ -2,7 +2,8 @@
   <div>
     <div class="containers">
       <div class="canvas" ref="canvas" id="canvas"></div>
-      <div class="properties-panel-parent" id="js-properties-panel"></div>
+      <!-- <div class="properties-panel-parent" id="js-properties-panel"></div> -->
+      <right-menu />
     </div>
   </div>
 </template>
@@ -11,12 +12,14 @@
 import BpmnModeler from 'bpmn-js/lib/Modeler';
 import customTranslate from '../js/customTranslate';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
-import {
-  BpmnPropertiesPanelModule,
-  BpmnPropertiesProviderModule,
-} from 'bpmn-js-properties-panel';
+import rightMenu from './rightMenu.vue';
+// import {
+//   // BpmnPropertiesPanelModule,
+//   // BpmnPropertiesProviderModule,
+// } from 'bpmn-js-properties-panel';
 
 export default {
+  components: { rightMenu },
   name: 'bpmn',
   data() {
     return {
@@ -40,11 +43,12 @@ export default {
           parent: '#js-properties-panel',
         },
         additionalModules: [
-          BpmnPropertiesPanelModule,
-          BpmnPropertiesProviderModule,
+          // BpmnPropertiesPanelModule,
+          // BpmnPropertiesProviderModule,
           this.customTranslateModule, //汉化
         ],
         moddleExtensions: {
+          //如果要在属性面板中修改属性，必须添加
           camunda: camundaModdleDescriptor,
         },
       });
@@ -76,8 +80,8 @@ export default {
 
 .properties-panel-parent {
   display: block;
-  border-left: 1px solid #ccc;
   overflow: auto;
+  border: 1px solid #e6e6e6;
 }
 
 .properties-panel-parent:empty {
