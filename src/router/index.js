@@ -30,8 +30,8 @@ const routes = [
         },
         children: [
           {
-            path: '/flow',
-            name: 'flow',
+            path: '/process',
+            name: 'process',
             component: () => import('../views/Flow/flow.vue'),
             meta: {
               title: '大流程',

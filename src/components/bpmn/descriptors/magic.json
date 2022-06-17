@@ -1,0 +1,42 @@
+{
+  "name": "Magic",
+  "uri": "http://magic",
+  "prefix": "magic",
+  "associations": [],
+  "types": [
+    {
+      "name": "BewitchedStartEvent",
+      "extends": [
+        "bpmn:StartEvent"
+      ],
+      "properties": [
+        {
+          "name": "spell",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "DemoServiceTask",
+      "superClass": [
+        "bpmn:SubProcess"
+      ],
+      "properties": [
+        {
+          "name": "demoName",
+          "default": "123",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    }
+  ],
+  "enumerations": [
+
+  ],
+  "xml": {
+    "tagAlias": "lowerCase",
+    "typePrefix": "t"
+  }
+}
