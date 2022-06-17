@@ -3,27 +3,37 @@
     <div class="containers">
       <div class="canvas" ref="canvas" id="canvas"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
+      <button @click="out">导出Xml到控制台（临时）</button>
     </div>
+    <select-type-panel :visible="dialogVisible"/>
   </div>
 </template>
 
 <script>
+import 'bpmn-js/dist/assets/diagram-js.css'; // 左边工具栏外框样式
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'; // 左边工具栏元素样式
+import 'bpmn-js-properties-panel/dist/assets/properties-panel.css'; // 右侧编辑框样式
+
 import BpmnModeler from 'bpmn-js/lib/Modeler';
-import {
-  BpmnPropertiesPanelModule,
-  BpmnPropertiesProviderModule,
-} from 'bpmn-js-properties-panel';
+import TranslateModule from "@/components/bpmn/translate";
+import PrefabricationPaletteProviderModule from "@/components/bpmn/palette";
+import SelectTypePanel from "@/components/process/SelectTypePanel";
+import NyanRender from "@/components/bpmn/draw";
+import descriptors from "@/components/bpmn/descriptors";
 
 export default {
   name: 'bpmn',
+  components: {SelectTypePanel},
   data() {
     return {
       containerEl: null,
       bpmnModeler: null,
       fileList: [],
+      dialogVisible: true
     };
   },
-  created() {},
+  created() {
+  },
   mounted() {
     this.init();
   },
@@ -35,27 +45,34 @@ export default {
           parent: '#js-properties-panel',
         },
         additionalModules: [
-          BpmnPropertiesPanelModule,
-          BpmnPropertiesProviderModule,
-          // PrefabricationPaletteProviderModule
+          PrefabricationPaletteProviderModule,
+          NyanRender,
+          TranslateModule
         ],
+        moddleExtensions:{
+          ...descriptors
+        }
+
       });
+      this.bpmnModeler.createDiagram()
     },
+    out(){
+      this.bpmnModeler.saveXML({format: true}).then(xml=> console.log(xml.xml))
+    }
   },
 };
 </script>
 
-<style  scoped lang="less">
-@import '~bpmn-js/dist/assets/diagram-js.css'; // 左边工具栏外框样式
-@import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'; // 左边工具栏元素样式
-@import '~bpmn-js-properties-panel/dist/assets/properties-panel.css'; // 右侧编辑框样式
+<style scoped lang="less">
 .containers {
   height: calc(100vh - 160px);
   position: relative;
+
   .canvas {
     height: 100%;
   }
 }
+
 #js-properties-panel {
   width: 300px;
   height: calc(100vh - 160px);

@@ -40,7 +40,6 @@ export default {
   },
   created() {
     this.route = router.options.routes[0].children;
-    console.log('11111', this.$router);
   },
   mounted() {},
   methods: {
