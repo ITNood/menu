@@ -24,12 +24,12 @@
             <el-input size="mini" v-model="decisionForm.name"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="decisionForm.dataname">
+            <el-select v-model="decisionForm.dataname" size="mini">
               <el-option v-for="item in items" :key="item" :value="item.value"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="条件：" prop="condition">
-            <el-select v-model="decisionForm.condition">
+            <el-select v-model="decisionForm.condition" size="mini">
               <el-option value=">"></el-option>
               <el-option value="<"></el-option>
               <el-option value=">="></el-option>
@@ -38,7 +38,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="阈值：" prop="threshold">
-            <el-input-number v-model="decisionForm.threshold"></el-input-number>
+            <el-input-number v-model="decisionForm.threshold" size="mini"></el-input-number>
           </el-form-item>
         </el-form>
         <el-button size="mini" type="primary" class="confirm">确认</el-button>
