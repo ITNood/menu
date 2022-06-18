@@ -1,6 +1,19 @@
 <template>
   <div id="collapseList">
     <el-collapse v-model="activeNames" @change="handleChange">
+      <el-collapse-item title="基础信息" name="0">
+        <el-form :model="basicsForm" ref="basicsForm" label-width="100px">
+          <el-form-item label="ID：" prop="id">
+            <el-input v-model="basicsForm.id" size="mini"></el-input>
+          </el-form-item>
+          <el-form-item label="名称：" prop="name">
+            <el-input v-model="basicsForm.name" size="mini"></el-input>
+          </el-form-item>
+          <el-form-item label="组件类型：" prop="type">
+            <el-input v-model="basicsForm.type" size="mini"></el-input>
+          </el-form-item>
+        </el-form>
+      </el-collapse-item>
       <el-collapse-item title="SUB FLOW" name="1">
         <el-form :model="form" ref="form" label-width="55px">
           <el-form-item label="名称：" prop="name">
@@ -93,7 +106,7 @@ export default {
   name: 'rightMenu',
   data() {
     return {
-      activeNames: ['1'],
+      activeNames: ['0'],
       form: {
         name: '',
       },
@@ -112,6 +125,11 @@ export default {
         type: '',
         ID: '55555d5s',
         name: 'dadfafds',
+      },
+      basicsForm: {
+        id: '',
+        name: '',
+        type: '',
       },
     };
   },
