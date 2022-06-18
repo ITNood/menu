@@ -4,9 +4,9 @@
       <div class="canvas" ref="canvas" id="canvas"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
       <button @click="out">导出Xml到控制台（临时）</button>
-      <right-menu />
+      <right-menu @toggleFlow="out" />
     </div>
-    <select-type-panel :visible="dialogVisible"/>
+    <select-type-panel :visible="dialogVisible" />
   </div>
 </template>
 
@@ -16,27 +16,26 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'; // 左边工具栏
 import 'bpmn-js-properties-panel/dist/assets/properties-panel.css'; // 右侧编辑框样式
 
 import BpmnModeler from 'bpmn-js/lib/Modeler';
-import TranslateModule from "@/components/bpmn/translate";
-import PrefabricationPaletteProviderModule from "@/components/bpmn/palette";
-import SelectTypePanel from "@/components/process/SelectTypePanel";
-import NyanRender from "@/components/bpmn/draw";
-import descriptors from "@/components/bpmn/descriptors";
+import TranslateModule from '@/components/bpmn/translate';
+import PrefabricationPaletteProviderModule from '@/components/bpmn/palette';
+import SelectTypePanel from '@/components/process/SelectTypePanel';
+import NyanRender from '@/components/bpmn/draw';
+import descriptors from '@/components/bpmn/descriptors';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 import rightMenu from './rightMenu.vue';
 
 export default {
   name: 'bpmn',
-  components: {SelectTypePanel,rightMenu},
+  components: { SelectTypePanel, rightMenu },
   data() {
     return {
       containerEl: null,
       bpmnModeler: null,
       fileList: [],
-      dialogVisible: true
+      dialogVisible: false,
     };
   },
-  created() {
-  },
+  created() {},
   mounted() {
     this.init();
   },
@@ -50,19 +49,21 @@ export default {
         additionalModules: [
           PrefabricationPaletteProviderModule,
           NyanRender,
-          TranslateModule
+          TranslateModule,
         ],
-        moddleExtensions:{
+        moddleExtensions: {
           ...descriptors,
           camunda: camundaModdleDescriptor,
-        }
-
+        },
       });
       this.bpmnModeler.createDiagram();
     },
-    out(){
-      this.bpmnModeler.saveXML({format: true}).then(xml=> console.log(xml.xml))
-    }
+    out() {
+      this.dialogVisible = !this.dialogVisible;
+      this.bpmnModeler
+        .saveXML({ format: true })
+        .then((xml) => console.log(xml.xml));
+    },
   },
 };
 </script>

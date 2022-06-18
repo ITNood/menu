@@ -30,11 +30,11 @@
           </el-form-item>
           <el-form-item label="条件：" prop="condition">
             <el-select v-model="decisionForm.condition" size="mini">
-              <el-option value=">"></el-option>
-              <el-option value="<"></el-option>
-              <el-option value=">="></el-option>
-              <el-option value="<="></el-option>
-              <el-option value="="></el-option>
+              <el-option value=">" label="大于"></el-option>
+              <el-option value="<" label="小于"></el-option>
+              <el-option value=">=" label="大于等于"></el-option>
+              <el-option value="<=" label="小于等于"></el-option>
+              <el-option value="=" label="等于"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="阈值：" prop="threshold">
@@ -50,6 +50,31 @@
           <i class="el-icon-circle-close" @click="del(index)"></i>
         </div>
         <el-button icon="el-icon-plus" type="primary" size="mini" @click="addRules">添加</el-button>
+      </el-collapse-item>
+
+      <el-collapse-item title="引用信息" name="4">
+        <el-form :model="quoteForm" ref="quoteForm" label-width="100px">
+          <el-form-item label="引用类型：" prop="type">
+            <el-select v-model="quoteForm.type" size="mini">
+              <el-option value="流程1"></el-option>
+              <el-option value="流程2"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="引用ID：" prop="ID">
+            <el-input v-model="quoteForm.ID" disabled size="mini"></el-input>
+          </el-form-item>
+          <el-form-item label="引用名称：" prop="ID">
+            <el-input v-model="quoteForm.name" disabled size="mini"></el-input>
+          </el-form-item>
+        </el-form>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-button icon="el-icon-refresh-right" type="success" round size="mini" @click="toggleFlow">切换流程</el-button>
+          </el-col>
+          <el-col :span="12">
+            <el-button icon="el-icon-delete" type="danger" round size="mini">清除引用</el-button>
+          </el-col>
+        </el-row>
       </el-collapse-item>
     </el-collapse>
     <!----查看流程---->
@@ -83,11 +108,17 @@ export default {
       },
       items: [],
       lists: [{ name: '' }],
+      quoteForm: {
+        type: '',
+        ID: '55555d5s',
+        name: 'dadfafds',
+      },
     };
   },
   created() {},
   mounted() {},
   methods: {
+    //折叠
     handleChange(val) {
       console.log(val);
     },
@@ -103,15 +134,23 @@ export default {
     openFlow() {
       this.isshow = !this.isshow;
     },
-
+    //添加
     addRules() {
       this.lists.push({ name: '' });
     },
+    //删除
     del(index) {
-      console.log(index);
-      const list = [...this.lists];
-      list.splice(index, 1);
-      this.lists = [...list];
+      if (this.lists.length > 1) {
+        const list = [...this.lists];
+        list.splice(index, 1);
+        this.lists = [...list];
+      } else {
+        this.$message.warning('给我留点，不能再删了！');
+      }
+    },
+    //切换
+    toggleFlow() {
+      this.$emit('toggleFlow');
     },
   },
 };
