@@ -14,6 +14,7 @@
           </el-form-item>
         </el-form>
       </el-collapse-item>
+
       <el-collapse-item title="SUB FLOW" name="1">
         <el-form :model="form" ref="form" label-width="55px">
           <el-form-item label="名称：" prop="name">
