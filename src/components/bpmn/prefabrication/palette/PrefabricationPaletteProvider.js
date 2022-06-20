@@ -68,12 +68,12 @@ PrefabricationPaletteProvider.prototype.getPaletteEntries = function () {
             ...entries,
             'ref.separator.top':
                 createSeparator('ref'),
-            'create.magic-servicetask':
+            'create.ref-servicetask':
                 createAction(
                     'refBpmn:RefServiceTask',
                     'ref',
                     '',
-                    translate('Create Reference SubProcess')
+                    translate('Create Reference Servicetask')
                 ),
         };
     }

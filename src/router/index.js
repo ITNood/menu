@@ -20,7 +20,6 @@ const routes = [
           icon: 'el-icon-s-home'
         }
       },
-
       {
         path: '',
         component: () => import('../views/Flow/index.vue'),
@@ -30,8 +29,8 @@ const routes = [
         },
         children: [
           {
-            path: '/process',
-            name: 'process',
+            path: '/flow',
+            name: 'flow',
             component: () => import('../views/Flow/flow.vue'),
             meta: {
               title: '大流程',
@@ -65,6 +64,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   //判断路由是否是/login，如果是，直接调用next方法
   if (to.path == "/login") {
+
     next();
   } else {
     const info = JSON.parse(localStorage.getItem('userInfo'))

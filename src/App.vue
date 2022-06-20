@@ -10,9 +10,7 @@ export default {
   },
   created() {
     const info = JSON.parse(localStorage.getItem('userInfo'));
-    if (info) {
-      this.$router.push('/home');
-    } else {
+    if (!info) {
       this.$router.push('/login');
     }
   },

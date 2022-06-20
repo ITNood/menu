@@ -16,7 +16,7 @@ export default function Prefabrication(eventBus) {
   BaseRenderer.call(this, eventBus, 1500);
 
   this.canRender = function(element) {
-    return is(element, 'magic:ServiceTask');
+    return is(element, 'refBpmn:RefServiceTask');
   };
 
 
