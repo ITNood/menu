@@ -12,12 +12,11 @@ import {
 } from 'tiny-svg';
 
 
-export default function NyanRender(eventBus) {
+export default function Prefabrication(eventBus) {
   BaseRenderer.call(this, eventBus, 1500);
 
   this.canRender = function(element) {
-    console.log(element,'magic:DemoServiceTask',is(element, 'magic:DemoServiceTask'))
-    return is(element, 'magic:DemoServiceTask');
+    return is(element, 'magic:ServiceTask');
   };
 
 
@@ -37,6 +36,6 @@ export default function NyanRender(eventBus) {
   };
 }
 
-inherits(NyanRender, BaseRenderer);
+inherits(Prefabrication, BaseRenderer);
 
-NyanRender.$inject = [ 'eventBus' ];
+Prefabrication.$inject = [ 'eventBus' ];

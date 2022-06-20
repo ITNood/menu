@@ -1,32 +1,43 @@
 <template>
   <div>
+    <!--    <header-buttons size="mini" type="primary"/>-->
     <div class="containers">
       <div class="canvas" ref="canvas" id="canvas"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
       <button @click="out">导出Xml到控制台（临时）</button>
-      <right-menu />
+      <right-menu/>
     </div>
     <select-type-panel :visible="dialogVisible"/>
   </div>
 </template>
 
 <script>
+/**
+ * CSS
+ */
 import 'bpmn-js/dist/assets/diagram-js.css'; // 左边工具栏外框样式
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'; // 左边工具栏元素样式
 import 'bpmn-js-properties-panel/dist/assets/properties-panel.css'; // 右侧编辑框样式
-
+/**
+ * Plugins
+ */
+import RightMenu from './rightMenu.vue';
+// import HeaderButtons from "@/views/Home/components/process/tools/HeaderButtons";
+import SelectTypePanel from "./tools/SelectTypePanel";
+/**
+ * Bpmn And Bpmn Extend
+ */
 import BpmnModeler from 'bpmn-js/lib/Modeler';
-import TranslateModule from "@/components/bpmn/translate";
-import PrefabricationPaletteProviderModule from "@/components/bpmn/palette";
-import SelectTypePanel from "@/components/process/SelectTypePanel";
-import NyanRender from "@/components/bpmn/draw";
-import descriptors from "@/components/bpmn/descriptors";
-import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
-import rightMenu from './rightMenu.vue';
+import {
+  PrefabricationTranslateModule,
+  PrefabricationPaletteModule,
+  PrefabricationReaderModule,
+  PrefabricationModuleDescriptor,
+} from '@/components/bpmn/prefabrication';
 
 export default {
   name: 'bpmn',
-  components: {SelectTypePanel,rightMenu},
+  components: {SelectTypePanel, RightMenu,},
   data() {
     return {
       containerEl: null,
@@ -44,24 +55,20 @@ export default {
     init() {
       this.bpmnModeler = new BpmnModeler({
         container: '#canvas',
-        propertiesPanel: {
-          parent: '#js-properties-panel',
-        },
         additionalModules: [
-          PrefabricationPaletteProviderModule,
-          NyanRender,
-          TranslateModule
+          PrefabricationTranslateModule,
+          PrefabricationPaletteModule,
+          PrefabricationReaderModule
         ],
-        moddleExtensions:{
-          ...descriptors,
-          camunda: camundaModdleDescriptor,
+        moddleExtensions: {
+          ...PrefabricationModuleDescriptor,
         }
 
       });
       this.bpmnModeler.createDiagram();
     },
-    out(){
-      this.bpmnModeler.saveXML({format: true}).then(xml=> console.log(xml.xml))
+    out() {
+      this.bpmnModeler.saveXML({format: true}).then(xml => console.log(xml.xml))
     }
   },
 };

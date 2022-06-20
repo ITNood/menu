@@ -1,0 +1,29 @@
+{
+  "name": "RefBpmn",
+  "uri": "http://www.omg.org/spec/Ref/20100524/MODEL",
+  "prefix": "refBpmn",
+  "associations": [],
+  "types": [
+    {
+      "name": "RefServiceTask",
+      "superClass": [
+        "bpmn:ServiceTask"
+      ],
+      "properties": [
+        {
+          "name": "ref",
+          "default": "",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    }
+  ],
+  "enumerations": [
+
+  ],
+  "xml": {
+    "tagAlias": "lowerCase",
+    "typePrefix": "t"
+  }
+}

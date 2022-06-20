@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Bpmn from './components/bpmn.vue';
+import Bpmn from './components/process/bpmn.vue';
 export default {
   components: { Bpmn },
   data() {
