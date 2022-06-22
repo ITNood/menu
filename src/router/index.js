@@ -53,7 +53,6 @@ const routes = [
     name: 'Login',
     component: () => import('../views/login')
   },
-
 ]
 
 const router = new VueRouter({
@@ -62,9 +61,9 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
+  console.log(to, from)
   //判断路由是否是/login，如果是，直接调用next方法
   if (to.path == "/login") {
-
     next();
   } else {
     const info = JSON.parse(localStorage.getItem('userInfo'))
