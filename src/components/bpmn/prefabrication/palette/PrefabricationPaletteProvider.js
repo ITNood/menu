@@ -55,16 +55,25 @@ PrefabricationPaletteProvider.prototype.getPaletteEntries = function () {
         };
     }
 
+    function createSeparator(group) {
+        return {
+            group: group,
+            separator: true
+        };
+    }
+
     // 使用方法类型返回时，可以处理原有的元素，现在即为 entries 再该方法返回时去除 ...entries将会移出原有的所有元素
     return function (entries) {
         return {
             ...entries,
-            'create.subprocess-reference':
+            'ref.separator.top':
+                createSeparator('ref'),
+            'create.ref-servicetask':
                 createAction(
-                    'magic:DemoServiceTask',
-                    'dev',
+                    'refBpmn:RefServiceTask',
+                    'ref',
                     '',
-                    translate('Create Reference SubProcess')
+                    translate('Create Reference Servicetask')
                 ),
         };
     }

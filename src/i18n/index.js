@@ -6,9 +6,9 @@ import enLocale from "element-ui/lib/locale/lang/en"; //英文
 import zhLocale from "element-ui/lib/locale/lang/zh-CN";  //中文
 import zhTwLocale from "element-ui/lib/locale/lang/zh-TW";  //中文-台湾
 
-import enLang from "./lang/en"; //英文
-import zhLang from "./lang/zh-CN";  //中文
-import zhTwLang from "./lang/zh-TW";  //中文-台湾
+import enLang from "@/components/bpmn/prefabrication/translate/lang/en"; //英文
+import zhLang from "@/components/bpmn/prefabrication/translate/lang/zh-CN";  //中文
+import zhTwLang from "@/components/bpmn/prefabrication/translate/lang/zh-TW";  //中文-台湾
 
 Vue.use(VueI18n)
 
