@@ -1,6 +1,6 @@
 <template>
   <div>
-    <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom"
+    <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn"
                     :bpmn="bpmnProp.bpmn" :min-zoom="0.1" :max-zoom="4"/>
     <div class="containers" ref="containers">
       <div class="canvas" ref="canvas" id="canvas"></div>
