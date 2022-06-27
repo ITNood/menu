@@ -61,7 +61,6 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
-  console.log(to, from)
   //判断路由是否是/login，如果是，直接调用next方法
   if (to.path == "/login") {
     next();
@@ -84,5 +83,11 @@ router.beforeEach((to, from, next) => {
     }
   }
 })
+//重复点击路由解决报错
+const originalPush = VueRouter.prototype.push
+// 修改原型对象中的push方法
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 export default router

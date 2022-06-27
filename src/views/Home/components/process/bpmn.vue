@@ -4,10 +4,10 @@
     <div class="containers">
       <div class="canvas" ref="canvas" id="canvas"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
-<!--      <button @click="out">导出Xml到控制台（临时）</button>-->
-      <right-menu @toggleFlow="out"/>
+      <!--      <button @click="out">导出Xml到控制台（临时）</button>-->
+      <right-menu @toggleFlow="out" />
     </div>
-    <select-type-panel :visible="dialogVisible"/>
+    <select-type-panel :visible="dialogVisible" />
   </div>
 </template>
 
@@ -23,7 +23,7 @@ import 'bpmn-js-properties-panel/dist/assets/properties-panel.css'; // 右侧编
  */
 // import HeaderButtons from "@/views/Home/components/process/tools/HeaderButtons";
 import RightMenu from './rightMenu.vue';
-import SelectTypePanel from "./tools/SelectTypePanel";
+import SelectTypePanel from './tools/SelectTypePanel';
 /**
  * Bpmn And Bpmn Extend
  */
@@ -38,18 +38,17 @@ import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 
 export default {
   name: 'bpmn',
-  components: {SelectTypePanel, RightMenu,},
+  components: { SelectTypePanel, RightMenu },
 
   data() {
     return {
       containerEl: null,
       bpmnModeler: null,
       fileList: [],
-      dialogVisible: false,
+      dialogVisible: true,
     };
   },
-  created() {
-  },
+  created() {},
   mounted() {
     this.init();
   },
@@ -60,12 +59,12 @@ export default {
         additionalModules: [
           PrefabricationTranslateModule,
           PrefabricationPaletteModule,
-          PrefabricationReaderModule
+          PrefabricationReaderModule,
         ],
         moddleExtensions: {
           ...PrefabricationModuleDescriptor,
           camunda: camundaModdleDescriptor,
-        }
+        },
       });
       this.bpmnModeler.createDiagram();
     },
@@ -74,8 +73,8 @@ export default {
 
       this.dialogVisible = !this.dialogVisible;
       this.bpmnModeler
-          .saveXML({format: true})
-          .then((xml) => console.log(xml.xml));
+        .saveXML({ format: true })
+        .then((xml) => console.log(xml.xml));
     },
   },
 };
