@@ -1,15 +1,13 @@
 <template>
   <div>
     <bpmn />
-    <banner ref="banner" />
   </div>
 </template>
 
 <script>
 import Bpmn from './components/process/bpmn.vue';
-import Banner from './components/banner/index.vue';
 export default {
-  components: { Bpmn, Banner },
+  components: { Bpmn },
   data() {
     return {};
   },

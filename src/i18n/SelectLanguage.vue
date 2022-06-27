@@ -15,10 +15,10 @@ export default {
   name: "SelectLanguage",
   data () {
     return {
-      nowLang: localStorage.getItem('lang'),
+      nowLang: this.$i18n.locale,
       options:[
-        { value: 'zh_CN', label: '简体中文' },
-        { value: 'en_US', label: 'English' }
+        { value: 'zh-CN', label: '简体中文' },
+        { value: 'en-US', label: 'English' }
       ]
     }
   },

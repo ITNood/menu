@@ -1,4 +1,4 @@
-import i18n from "@/i18n";
+import newI18n from "@/i18n";
 
 export default function PrefabricationTranslate(template, replacements) {
     replacements = replacements || {};
@@ -15,5 +15,7 @@ export default function PrefabricationTranslate(template, replacements) {
 
 // 定义详细的翻译方式
 function translations(template) {
-    return i18n.t('bpmn["'+template+'"]') || template;
+    let key = 'bpmn["' + template + '"]';
+    let tValue = newI18n.t('bpmn["' + template + '"]')
+    return tValue !== key ? tValue : template || template;
 }

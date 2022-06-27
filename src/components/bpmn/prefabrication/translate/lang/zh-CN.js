@@ -1,3 +1,5 @@
+'use strict';
+
 exports.__esModule = true;
 exports.default = {
   bpmn: {
@@ -7,7 +9,6 @@ exports.default = {
     "Append Task": "追加任务",
     "Append Intermediate/Boundary Event": "追加中间抛出事件/边界事件",
     "TextAnnotation": "文字说明",
-
     "Activate the global connect tool": "激活全局连接工具",
     "Append {type}": "添加{type}",
     "Add Lane above": "在上面添加道",
@@ -19,7 +20,7 @@ exports.default = {
     "Connect using Association": "使用关联连接",
     "Connect using Sequence/MessageFlow or Association": "使用顺序/消息流或者关联连接",
     "Connect using DataInputAssociation": "使用数据输入关联连接",
-    'Remove': "移除",
+    Remove: "移除",
     "Activate the hand tool": "激活抓手工具",
     "Activate the lasso tool": "激活套索工具",
     "Activate the create/remove space tool": "激活创建/删除空间工具",
@@ -28,12 +29,12 @@ exports.default = {
     "Create Pool/Participant": "创建池/参与者",
     "Parallel Multi Instance": "并行多重事件",
     "Sequential Multi Instance": "时序多重事件",
-    'DataObjectReference': "数据对象参考",
-    'DataStoreReference': "数据存储参考",
-    'Loop': "循环",
+    DataObjectReference: "数据对象参考",
+    DataStoreReference: "数据存储参考",
+    Loop: "循环",
     "Ad-hoc": "即席",
     "Create {type}": "创建 {type}",
-    'Task': "任务",
+    Task: "任务",
     "Send Task": "发送任务",
     "Receive Task": "接收任务",
     "User Task": "用户任务",
@@ -45,10 +46,10 @@ exports.default = {
     "Sub Process (collapsed)": "子流程（折叠的）",
     "Sub Process (expanded)": "子流程（展开的）",
     "Start Event": "开始事件",
-    'StartEvent': "开始事件",
+    "StartEvent": "开始事件",
     "Intermediate Throw Event": "中间事件",
     "End Event": "结束事件",
-    'EndEvent': "结束事件",
+    EndEvent: "结束事件",
     "Create StartEvent": "创建开始事件",
     "Create EndEvent": "创建结束事件",
     "Create Task": "创建任务",
@@ -105,12 +106,11 @@ exports.default = {
     "Inclusive Gateway": "相容网关",
     "Complex Gateway": "复杂网关",
     "Event based Gateway": "事件网关",
-    'Transaction': "转运",
+    Transaction: "转运",
     "Sub Process": "子流程",
     "Event Sub Process": "事件子流程",
     "Collapsed Pool": "折叠池",
     "Expanded Pool": "展开池",
-
     // Errors
     "no parent for {element} in {parent}": "在{parent}里，{element}没有父类",
     "no shape type specified": "没有指定的形状类型",

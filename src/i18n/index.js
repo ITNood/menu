@@ -6,24 +6,24 @@ import enLocale from "element-ui/lib/locale/lang/en"; //英文
 import zhLocale from "element-ui/lib/locale/lang/zh-CN";  //中文
 import zhTwLocale from "element-ui/lib/locale/lang/zh-TW";  //中文-台湾
 
-import enLang from "@/components/bpmn/prefabrication/translate/lang/en"; //英文
-import zhLang from "@/components/bpmn/prefabrication/translate/lang/zh-CN";  //中文
-import zhTwLang from "@/components/bpmn/prefabrication/translate/lang/zh-TW";  //中文-台湾
+import enLang from "../components/bpmn/prefabrication/translate/lang/en"; //英文
+import zhLang from "../components/bpmn/prefabrication/translate/lang/zh-CN";  //中文
+import zhTwLang from "../components/bpmn/prefabrication/translate/lang/zh-TW";  //中文-台湾
 
 Vue.use(VueI18n)
 
 let lang =
     localStorage.getItem('lang') ||
     navigator.language ||
-    "zh_CN";
+    "zh-CN";
 
 const i18n = new VueI18n({
     locale: lang, // 语言标识
-    fallbackLocale: 'zh_CN',
+    fallbackLocale: 'zh-CN',
     messages: {
-        en_US: {...enLang, ...enLocale}, // 英文
-        zh_CN: {...zhLang, ...zhLocale}, // 简体中文
-        zh_TW: {...zhTwLang, ...zhTwLocale}, // 繁体中文-台湾
+        "en-US": {...enLang, ...enLocale}, // 英文
+        "zh-CN": {...zhLang, ...zhLocale}, // 简体中文
+        "zh-TW": {...zhTwLang, ...zhTwLocale}, // 繁体中文-台湾
     }
 })
 
