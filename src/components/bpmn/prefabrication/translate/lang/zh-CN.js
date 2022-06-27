@@ -1,3 +1,5 @@
+'use strict';
+
 exports.__esModule = true;
 exports.default = {
     bpmn: {
@@ -45,7 +47,7 @@ exports.default = {
         "Sub Process (collapsed)": "子流程（折叠的）",
         "Sub Process (expanded)": "子流程（展开的）",
         "Start Event": "开始事件",
-        StartEvent: "开始事件",
+        "StartEvent": "开始事件",
         "Intermediate Throw Event": "中间事件",
         "End Event": "结束事件",
         EndEvent: "结束事件",

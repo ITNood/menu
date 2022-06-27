@@ -1,7 +1,6 @@
 <template>
   <div>
     <bpmn />
-    <banner ref="banner" />
   </div>
 </template>
 
@@ -9,7 +8,7 @@
 import Banner from '../../components/banner/index.vue';
 import Bpmn from './components/process/bpmn.vue';
 export default {
-  components: { Bpmn, Banner },
+  components: { Bpmn },
   data() {
     return {};
   },

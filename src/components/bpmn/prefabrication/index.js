@@ -1,4 +1,3 @@
-
 /**
  * 用于提供额外的组件解析库，Bpmn通过此类内容附加到 moddleExtensions的操作来验证xml中的格式
  * Prefabrication Add New Xml Element

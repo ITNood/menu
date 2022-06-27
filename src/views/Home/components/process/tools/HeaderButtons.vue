@@ -1,7 +1,7 @@
 <template>
   <div class="header">
-    <input type="file" id="files" ref="refFile" style="display: none" accept=".xml, .bpmn" />
-<!--    @change="importLocalFile"-->
+    <input type="file" id="files" ref="refFile" style="display: none" accept=".xml, .bpmn"/>
+    <!--    @change="importLocalFile"-->
     <el-button-group key="file-control">
       <!--          <el-button :size="size" :type="headerButtonType" icon="el-icon-edit-outline" @click="onSave">保存流程</el-button>-->
       <el-button :size="size" :type="type" icon="el-icon-folder-opened"
@@ -17,14 +17,14 @@
         </div>
         <el-button :size="size" :type="type" icon="el-icon-download">下载文件</el-button>
       </el-tooltip>
-<!--      <el-tooltip effect="light">-->
-<!--        <div slot="content">-->
-<!--          <el-button :size="size" type="text" @click="previewProcessXML">预览XML</el-button>-->
-<!--          <br/>-->
-<!--          <el-button :size="size" type="text" @click="previewProcessJson">预览JSON</el-button>-->
-<!--        </div>-->
-<!--        <el-button :size="size" :type="type" icon="el-icon-view">预览</el-button>-->
-<!--      </el-tooltip>-->
+      <!--      <el-tooltip effect="light">-->
+      <!--        <div slot="content">-->
+      <!--          <el-button :size="size" type="text" @click="previewProcessXML">预览XML</el-button>-->
+      <!--          <br/>-->
+      <!--          <el-button :size="size" type="text" @click="previewProcessJson">预览JSON</el-button>-->
+      <!--        </div>-->
+      <!--        <el-button :size="size" :type="type" icon="el-icon-view">预览</el-button>-->
+      <!--      </el-tooltip>-->
       <!--        <el-tooltip v-if="simulation" effect="light" :content="this.simulationStatus ? '退出模拟' : '开启模拟'">-->
       <!--          <el-button :size="size" :type="headerButtonType" icon="el-icon-cpu" @click="processSimulation">-->
       <!--            模拟-->
@@ -61,12 +61,12 @@
 
     <el-button-group key="scale-control">
       <el-tooltip effect="light" content="缩小视图">
-        <el-button :size="size" :disabled="defaultZoom <= 0.3" icon="el-icon-zoom-out"
+        <el-button :size="size" :disabled="value <= minZoom" icon="el-icon-zoom-out"
                    @click="processZoomOut()"/>
       </el-tooltip>
-      <el-button :size="size">{{ Math.floor(this.defaultZoom * 10 * 10) + "%" }}</el-button>
+      <el-button :size="size">{{ Math.floor(this.value * 10 * 10) + "%" }}</el-button>
       <el-tooltip effect="light" content="放大视图">
-        <el-button :size="size" :disabled="defaultZoom >= 6.9" icon="el-icon-zoom-in"
+        <el-button :size="size" :disabled="value >= maxZoom" icon="el-icon-zoom-in"
                    @click="processZoomIn()"/>
       </el-tooltip>
       <el-tooltip effect="light" content="自适应">
@@ -74,19 +74,19 @@
       </el-tooltip>
     </el-button-group>
 
-    <el-button-group key="stack-control">
-      <el-tooltip effect="light" content="撤销">
-        <el-button :size="size" :disabled="bpmn && bpmn.get('commandStack') && bpmn.get('commandStack').canRedo" icon="el-icon-refresh-left"
-                   @click="processUndo()"/>
-      </el-tooltip>
-      <el-tooltip effect="light" content="恢复">
-        <el-button :size="size" :disabled="bpmn && bpmn.get('commandStack') && bpmn.get('commandStack').canUndo" icon="el-icon-refresh-right"
-                   @click="processRedo()"/>
-      </el-tooltip>
-      <el-tooltip effect="light" content="重新绘制">
-        <el-button :size="size" icon="el-icon-refresh" @click="processRestart"/>
-      </el-tooltip>
-    </el-button-group>
+    <!--    <el-button-group key="stack-control">-->
+    <!--      <el-tooltip effect="light" content="撤销">-->
+    <!--        <el-button :size="size" :disabled="bpmn && bpmn.get('commandStack') && bpmn.get('commandStack').canRedo" icon="el-icon-refresh-left"-->
+    <!--                   @click="processUndo()"/>-->
+    <!--      </el-tooltip>-->
+    <!--      <el-tooltip effect="light" content="恢复">-->
+    <!--        <el-button :size="size" :disabled="bpmn && bpmn.get('commandStack') && bpmn.get('commandStack').canUndo" icon="el-icon-refresh-right"-->
+    <!--                   @click="processRedo()"/>-->
+    <!--      </el-tooltip>-->
+    <!--      <el-tooltip effect="light" content="重新绘制">-->
+    <!--        <el-button :size="size" icon="el-icon-refresh" @click="processRestart"/>-->
+    <!--      </el-tooltip>-->
+    <!--    </el-button-group>-->
   </div>
 </template>
 
@@ -105,13 +105,38 @@ export default {
       default: "primary",
       validator: value => ["default", "primary", "success", "warning", "danger", "info"].indexOf(value) !== -1
     },
-  },
-  data() {
-    return {
-      defaultZoom: 1,
+    // Zoom
+    value: {
+      type: Number,
+      default: 1
+    },
+    // Zoom
+    defaultZoom: {
+      type: Number,
+      default: 1
+    },
+    minZoom: {
+      type: Number,
+      default: 0.1
+    },
+    maxZoom: {
+      type: Number,
+      default: 7
+    },
+    zoomStep: {
+      type: Number,
+      default: 0.1
     }
   },
-  methods:{
+  watch:{
+    value(newValue){
+      this.processZoomTo(newValue)
+    }
+  },
+  data() {
+    return {}
+  },
+  methods: {
     // 下载流程图到本地
     async downloadProcess(type, name) {
       try {
@@ -184,31 +209,35 @@ export default {
       }).then(() => Align.trigger(SelectedElements, align));
     },
 
-    processZoomIn(zoomStep = 0.1) {
-      this.processZoomTo(Math.floor(this.defaultZoom * 100 + zoomStep * 100) / 100);
+    processZoomIn(zoomStep = this.zoomStep) {
+      this.processZoomTo(Math.floor(this.value * 100 + zoomStep * 100) / 100);
     },
-    processZoomOut(zoomStep = 0.1) {
-      this.processZoomTo(Math.floor(this.defaultZoom * 100 - zoomStep * 100) / 100);
+    processZoomOut(zoomStep = this.zoomStep) {
+      this.processZoomTo(Math.floor(this.value * 100 - zoomStep * 100) / 100);
     },
     processAutoZoom() {
-      this.defaultZoom = 1;
+      let zoom = this.defaultZoom;
+      this.$emit("input", zoom);
+      this.$emit("change", zoom);
       this.bpmn.get("canvas").zoom("fit-viewport", "auto");
     },
     processZoomTo(newZoom = 1) {
-      if (newZoom < 0.2) {
-        throw new Error("[Process Designer Warn ]: The zoom ratio cannot be less than 0.2");
+      if (newZoom < this.minZoom) {
+        throw new Error("[Process Designer Warn ]: The zoom ratio cannot be less than " + this.minZoom);
       }
-      if (newZoom > 7) {
-        throw new Error("[Process Designer Warn ]: The zoom ratio cannot be greater than 4");
+      if (newZoom > this.maxZoom) {
+        throw new Error("[Process Designer Warn ]: The zoom ratio cannot be greater than " + this.maxZoom);
       }
-      this.defaultZoom = newZoom;
+      console.log(newZoom)
+      this.$emit("input", newZoom);
+      this.$emit("change", newZoom);
       this.bpmn.get("canvas").zoom(newZoom);
     },
     processRedo() {
-      this.bpmnModeler.get("commandStack").redo();
+      this.bpmn.get("commandStack").redo();
     },
     processUndo() {
-      this.bpmnModeler.get("commandStack").undo();
+      this.bpmn.get("commandStack").undo();
     },
   }
 }

@@ -1,84 +1,81 @@
 <template>
-  <el-dialog
-      title="选择流程"
-      :visible.sync="dialogVisible"
-      width="90%"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      :before-close="handleClose" append-to-body>
+  <div>
+    <el-dialog
+        title="选择流程"
+        :visible.sync="dialogVisible"
+        width="90%"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false" append-to-body>
 
-    <el-row>
-      <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item v-for="(item,index) in breadcrumb" :key="index">
-          <span v-on:click="choiceTypeByNameClick(item,index)">{{ item }}</span>
-        </el-breadcrumb-item>
-      </el-breadcrumb>
-    </el-row>
-    <el-divider></el-divider>
+      <!-- 面包屑 / 当前所在位置导航 -->
+      <el-row>
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+          <el-breadcrumb-item v-for="(item,index) in breadcrumb" :key="index">
+            <a v-on:click="choiceTypeByNameClick(item,index)">{{ item }}</a>
+          </el-breadcrumb-item>
+        </el-breadcrumb>
+      </el-row>
 
-    <el-row>
-      <el-col :span="20">
-        <el-row v-if="selectTypes && selectTypes.status && selectTypes.status === 'Active'">
-          <el-col :span="4" v-for="(element, index) in selectTypes.childNode" :key="index"
-                  :offset="index%4 > 0 ? 2 : 1">
+      <!-- 导航下的分割线 -->
+      <el-divider></el-divider>
+
+      <!-- 主面板 -->
+      <el-row>
+        <!-- 左侧为类型选择区域 -->
+        <el-col :span="20">
+          <el-row v-if="selectTypes && selectTypes.status && selectTypes.status === 'Active'">
+            <el-col :span="4" v-for="(element, index) in selectTypes.childNode" :key="index"
+                    :offset="index%4 > 0 ? 2 : 1">
               <el-card :shadow="(element.status && element.status === 'Active')?'hover':'never'">
                 <div v-on:click="choiceTypeClick(element)">
-                  <!--                  <el-image-->
-                  <!--                      :src="'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png'">-->
-                  <!--                    <div slot="placeholder" class="image-slot">-->
-                  <!--                      {{ $t('el.select.loading') }}<span class="dot">...</span>-->
-                  <!--                    </div>-->
-                  <!--                    <div slot="error" class="image-slot">-->
-                  <!--                      <i class="el-icon-picture-outline"></i>-->
-                  <!--                    </div>-->
-                  <!--                  </el-image>-->
                   <div style="padding: 14px;text-align: center; ">
                     <span>{{ element.moduleName }}</span>
                   </div>
                 </div>
               </el-card>
-          </el-col>
-        </el-row>
-      </el-col>
-      <el-col :span="4">
-        <el-col>
-          <el-button type="text" icon="el-icon-plus">创建一个新的流程</el-button>
-        </el-col>
-        <el-col>
-          <el-button type="text" icon="el-icon-star-on">选择模板</el-button>
-        </el-col>
-        <el-col>
-          <el-button type="text" icon="el-icon-search">使用历史流程</el-button>
-        </el-col>
-      </el-col>
-    </el-row>
+            </el-col>
+          </el-row>
 
-    <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogVisible = false">{{ $t('el.messagebox.cancel') }}</el-button>
-    <el-button type="primary" @click="dialogVisible = false">{{ $t('el.messagebox.confirm') }}</el-button>
-  </span>
-  </el-dialog>
+          <!-- 左下半部分展示已选择的类型信息 -->
+          <el-row>
+
+          </el-row>
+        </el-col>
+        <el-col :span="4">
+          <el-col>
+            <el-button type="text" icon="el-icon-plus" @click="createNew">创建一个新的流程</el-button>
+          </el-col>
+          <el-col>
+            <el-button type="text" icon="el-icon-star-on" @click="selectTemplate">选择模板</el-button>
+          </el-col>
+          <el-col>
+            <el-button type="text" icon="el-icon-search" @click="selectHistory">使用历史流程</el-button>
+          </el-col>
+        </el-col>
+      </el-row>
+
+      <!-- TODO 测试完成后删除 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">{{ $t('el.messagebox.cancel') }}</el-button>
+        <el-button type="primary" @click="dialogVisible = false">{{ $t('el.messagebox.confirm') }}</el-button>
+      </span>
+    </el-dialog>
+    <banner ref="selectProcessBanner"/>
+  </div>
 </template>
 
 <script>
 import 'element-ui/lib/theme-chalk/base.css';
+import Banner from "@/components/banner";
 // 用于选择流程类型和配置相关属性
 export default {
-
   name: "SelectTypePanel",
-  components: {},
-  props: {
-    'visible': Boolean
-  },
-  watch: {
-    'visible'(newValue) {
-      this.dialogVisible = newValue;
-    }
-  },
+  components: {Banner},
   data() {
     return {
       dialogVisible: false,
+      bannerVisible: false,
       types: [
         {
           "id": 0,
@@ -879,17 +876,17 @@ export default {
     }
   },
   created() {
-    this.dialogVisible = this.visible;
+    // TODO 需要访问后端地址获取详细信息
+    // /menu/finAllMenu
+    // this.types = HTTPResponse();
+
     this.choiceTypeClick(this.types[0])
   },
   methods: {
-    handleClose(done) {
-      this.$confirm('确认关闭？')
-          .then(_ => {
-            this.$emit("onClose")
-          }).catch(_ => {
-      });
+    open() {
+      this.dialogVisible = !this.dialogVisible;
     },
+
     choiceTypeClick(element) {
       if (element.status && element.status === 'Active') {
         this.breadcrumb.push(element.moduleName)
@@ -900,7 +897,7 @@ export default {
       // Default SelectTypes Is All Types;
       let selectTypes = this.types[0];
       if (index != 0) {
-        for (let sliceElement of [...this.breadcrumb.slice(1, index+1)]) {
+        for (let sliceElement of [...this.breadcrumb.slice(1, index + 1)]) {
           let findItem = selectTypes.childNode.find(i => i.moduleName == sliceElement)
           if (findItem) {
             selectTypes = findItem;
@@ -913,6 +910,16 @@ export default {
         this.breadcrumb = [];
       }
       this.choiceTypeClick(selectTypes)
+    },
+
+    createNew() {
+      this.$emit("onClose");
+    },
+    selectTemplate() {
+      this.$refs['selectProcessBanner'].open('template',this.selectTypes.id)
+    },
+    selectHistory() {
+      this.$refs['selectProcessBanner'].open('history',this.selectTypes.id)
     },
   }
 }
