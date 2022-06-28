@@ -9,7 +9,8 @@ export default {
     return {};
   },
   created() {
-    const info = JSON.parse(localStorage.getItem('userInfo'));
+    const info = sessionStorage.getItem('userInfo');
+    console.log(info);
     if (!info) {
       this.$router.push('/login');
     }

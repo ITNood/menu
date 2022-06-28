@@ -30,6 +30,13 @@
   background-color  : #555;
 }
 
+ul,
+li {
+  list-style: none;
+  padding   : 0;
+  margin    : 0;
+}
+
 img {
   width: 100%;
 }
@@ -78,8 +85,9 @@ a {
 }
 
 .el-main {
-  height : calc(100vh - 120px);
-  padding: 20px;
+  height  : calc(100vh - 120px);
+  padding : 20px;
+  position: relative;
 }
 
 .el-header {
@@ -200,6 +208,43 @@ a {
     span {
       word-break: break-all;
       word-wrap : break-word;
+    }
+  }
+}
+
+/*---
+*----*
+----boxNews
+----
+----
+-----*/
+#boxNews {
+  width     : 350px;
+  height    : calc(100% - 40px);
+  position  : absolute;
+  top       : 20px;
+  left      : 20px;
+  overflow-y: auto;
+  border    : 1px solid #e6e6e6;
+
+  h2 {
+    background-color: #e6e6e6;
+    line-height     : 38px;
+    padding         : 0 15px;
+  }
+
+  .trayList {
+    li {
+      &:nth-child(even) {
+        background-color: rgb(239, 240, 247);
+      }
+
+      line-height: 30px;
+      padding    :0 15px;
+
+      span {
+        font-size: 12px;
+      }
     }
   }
 }
