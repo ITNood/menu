@@ -17,7 +17,6 @@
  */
 import 'bpmn-js/dist/assets/diagram-js.css'; // 左边工具栏外框样式
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'; // 左边工具栏元素样式
-import 'bpmn-js-properties-panel/dist/assets/properties-panel.css'; // 右侧编辑框样式
 /**
  * Plugins
  */
@@ -143,15 +142,15 @@ export default {
         props.zoom = Math.floor(scale * 100) / 100;
       });
 
-      props.modules.eventBus.on("element.updateProperties", (element) => {
-        // 数据更新后
-        console.log(element)
-        // this.selectElements = this.selectElements;
-
-        let newValue = this.selectElements;
-        this.selectElements = [];
-        this.selectElements = newValue;
-      });
+      // props.modules.eventBus.on("element.updateProperties", (element) => {
+      //   // 数据更新后
+      //   console.log(element)
+      //   // this.selectElements = this.selectElements;
+      //
+      //   // let newValue = this.selectElements;
+      //   // this.selectElements = [];
+      //   // this.selectElements = newValue;
+      // });
 
       props.modules.eventBus.on("selection.changed", (event) => {
         console.log(event)
@@ -320,10 +319,7 @@ export default {
     },
 
     changeColor(color, ...element) {
-      this.bpmnProp.bpmn.get('modeling').setColor([element], {
-        stroke: null,
-        fill: color
-      });
+      this.bpmnProp.bpmn.get('modeling').setColor([element], color);
     },
     out() {
 

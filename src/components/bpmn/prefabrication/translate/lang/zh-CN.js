@@ -2,6 +2,7 @@
 
 exports.__esModule = true;
 exports.default = {
+
     bpmn: {
         // 添加部分
         "Append EndEvent": "追加结束事件",
@@ -235,5 +236,8 @@ exports.default = {
         "Tasklist Configuration": "Tasklist配置",
         Startable: "启动",
         "Specify more than one group as a comma separated list.": "指定多个组作为逗号分隔的列表。"
-    }
+    },
+    true: "正确",
+    false: "错误",
+
 }
