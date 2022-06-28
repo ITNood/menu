@@ -1,13 +1,13 @@
 <template>
   <div>
-    <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn"
-                    :bpmn="bpmnProp.bpmn" :min-zoom="0.1" :max-zoom="4"/>
+    <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn" :bpmn="bpmnProp.bpmn" :min-zoom="0.1" :max-zoom="4" />
     <div class="containers" ref="containers">
       <div class="canvas" ref="canvas" id="canvas"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
-      <right-menu @toggleFlow="out" :elements="selectElements" :bpmn="bpmnProp.bpmn" @changeField="changeField"/>
+
+      <right-menu @toggleFlow="out" :elements="selectElements" :bpmn="bpmnProp.bpmn" @changeField="changeField" />
     </div>
-    <select-type-panel ref="typeSelect"/>
+    <select-type-panel ref="typeSelect" />
   </div>
 </template>
 
@@ -22,7 +22,7 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'; // 左边工具栏
  */
 import HeaderButtons from "./tools/HeaderButtons";
 import RightMenu from './rightMenu.vue';
-import SelectTypePanel from "./tools/SelectTypePanel";
+import SelectTypePanel from './tools/SelectTypePanel';
 /**
  * Bpmn And Bpmn Extend
  */
@@ -37,6 +37,7 @@ import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 
 export default {
   name: 'bpmn',
+
   //
   components: {SelectTypePanel, HeaderButtons, RightMenu},
 
@@ -85,8 +86,7 @@ export default {
       },
     };
   },
-  created() {
-  },
+  created() {},
   mounted() {
     // TODO 获取配置信息
     let conf = {}
@@ -109,12 +109,12 @@ export default {
         additionalModules: [
           PrefabricationTranslateModule,
           PrefabricationPaletteModule,
-          PrefabricationReaderModule
+          PrefabricationReaderModule,
         ],
         moddleExtensions: {
           ...PrefabricationModuleDescriptor,
           camunda: camundaModdleDescriptor,
-        }
+        },
       });
       Object.keys(props.modules).forEach(key => props.modules[key] = props.bpmn.get(key));
 

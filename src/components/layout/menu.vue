@@ -1,7 +1,7 @@
 <template>
   <div class="fixedMune">
     <div class="logo"><img src="../../assets/logo.png"><span v-if="!isCollapse">智因科技</span></div>
-    <el-menu id="mune" :collapse="isCollapse" @select="handleOpen" :default-active="activeIndex" background-color="#000000" active-text-color="#409eff">
+    <el-menu id="mune" :collapse="isCollapse" @select="handleOpen" :default-active="activeIndex" @open="openMenus" :default-openeds="opens" background-color="#000000" active-text-color="#409eff">
       <div v-for="item in routes" :key="item.path">
         <!-- 有子菜单 -->
         <el-submenu :index="item.path" v-if="item.children">
@@ -28,19 +28,30 @@ export default {
   props: { routes: Array, isCollapse: Boolean },
   data() {
     return {
-      activeIndex: '',
+      // activeIndex: '/home',
+      opens: [''],
     };
   },
-  created() {
-    this.activeIndex = '/home';
-  },
+  created() {},
   mounted() {},
+  computed: {
+    activeIndex: {
+      get: function () {
+        return this.$route.fullPath;
+      },
+      set: function (newVal) {
+        console.log('newVal', newVal);
+      },
+    },
+  },
   methods: {
     handleOpen(key, keyPath) {
-      console.log(key, keyPath);
       if (key) {
         this.$router.push({ path: key });
       }
+    },
+    openMenus(key, keyPath) {
+      console.log(key, keyPath);
     },
   },
 };
