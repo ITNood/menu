@@ -156,14 +156,18 @@ export default {
       this.volumeUse = `${data.volume_util * 100}%`;
       this.heightUse = `${data.depth_util * 100}%`;
     },
+    //当前货箱信息
+    getBox() {},
     //选择托盘编号
     change(val) {
       this.numberkpi = val;
       const data = datas._Container;
-      const arr = data._Goods.filter((e) => e.name == val);
-      const arr1 = data._Goods.filter((e) => e.name !== val);
-      arr1.unshift(...arr);
-      data._Goods = arr1;
+      //把选中的放到第一个位置
+      data._Goods.map((item, index) => {
+        if (item.name == val) {
+          data._Goods.unshift(data._Goods.splice(index, 1)[0]);
+        }
+      });
       this.getTrayNew(data._Goods[0]);
     },
     //上一个
