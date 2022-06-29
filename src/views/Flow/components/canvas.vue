@@ -58,24 +58,28 @@ export default {
           }
         });
       });
-      serverLocation = 'http://localhost:65384';
-      runtimeManager = new RuntimeManager();
-      renderH = $('#canvasImg').height();
-      renderW = $('#canvasImg').width();
-      console.log(renderH, renderW);
-      camera = new THREE.PerspectiveCamera(45, renderW / renderH, 1, 100000);
+      const serverLocation = 'http://localhost:65384';
+      const runtimeManager = new RuntimeManager();
+      const renderH = $('#canvasImg').height();
+      const renderW = $('#canvasImg').width();
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        renderW / renderH,
+        1,
+        100000
+      );
       camera.position.set(8000, 2000, 5000); //中心坐标 12000, 5000, 10000
-      scene = new THREE.Scene(); //三维坐标
+      const scene = new THREE.Scene(); //三维坐标
       scene.background = new THREE.Color('white'); //背景色
       if (renderer) {
         document.getElementById('canvasImg').removeChild(renderer.domElement);
       }
-      renderer = new THREE.WebGLRenderer({ antialias: true }); //创建渲染器对象
+      const renderer = new THREE.WebGLRenderer({ antialias: true }); //创建渲染器对象
       renderer.domElement.id = 'solution-preview';
       renderer.setSize(renderW, renderH); //设置全屏大小
       document.getElementById('canvasImg').appendChild(renderer.domElement); //添加到dom节点
-      controls = new THREE.OrbitControls(camera, renderer.domElement); //鼠标旋转、缩放、滚轮大小
-      ray = new THREE.Raycaster(); //点击交互
+      const controls = new THREE.OrbitControls(camera, renderer.domElement); //鼠标旋转、缩放、滚轮大小
+      const ray = new THREE.Raycaster(); //点击交互
       animate();
       runtimeManager.addSolution(new Solution(data));
       camera.fov = 20;

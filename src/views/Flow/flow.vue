@@ -19,6 +19,7 @@
       :lengthNumber="lengthNumber"
       :total="total"
       :play="play"
+      :arrayData="array"
       @prev="prev"
       @player="player"
       @reset="reset"
