@@ -239,5 +239,9 @@ exports.default = {
     },
     true: "正确",
     false: "错误",
-
+    condition:{
+        value: "条件",
+        pass: "通过",
+        fail: "不通过"
+    }
 }

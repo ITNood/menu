@@ -1,13 +1,15 @@
 <template>
   <div>
-    <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn" :bpmn="bpmnProp.bpmn" :min-zoom="0.1" :max-zoom="4" />
+    <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn" :bpmn="bpmnProp.bpmn"
+                    :min-zoom="0.1" :max-zoom="4"/>
     <div class="containers" ref="containers">
       <div class="canvas" ref="canvas" id="canvas"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
 
-      <right-menu @toggleFlow="out" :elements="selectElements" :bpmn="bpmnProp.bpmn" @changeField="changeField" />
+      <right-menu @toggleFlow="out" :panel-types="selectType" :elements="selectElements" :bpmn="bpmnProp.bpmn"
+                  @changeField="changeField"/>
     </div>
-    <select-type-panel ref="typeSelect" />
+    <select-type-panel ref="typeSelect" @onSelect="typeSelect"/>
   </div>
 </template>
 
@@ -46,27 +48,28 @@ export default {
       // 定制的元素标准颜色在不同场景下
       elementColorEnum: {
         unSave: {
-          stroke: null,
-          fill: 'rgb(255,0,0)'
+          fill: null,
+          stroke: 'rgb(255,0,0)'
         },
         imperfect: {
-          stroke: null,
-          fill: 'rgb(255,255,0)'
+          fill: null,
+          stroke: 'rgb(255,255,55)'
         },
         unCheck: {
-          stroke: null,
-          fill: 'rgb(0,255,255)'
+          fill: null,
+          stroke: 'rgb(0,255,255)'
         },
         complete: {
-          stroke: null,
-          fill: 'rgb(0,255,0)'
+          fill: null,
+          stroke: 'rgb(0,255,0)'
         },
         error: {
-          stroke: 'rgb(255,0,0)',
-          fill: 'rgb(0,0,0)'
+          fill: 'rgb(255,0,0)',
+          stroke: 'rgb(0,0,0)'
         }
       },
 
+      selectType: {},
       selectElements: [],
       // 系统处理标识，在初始化后更新
       initialized: false,
@@ -86,15 +89,45 @@ export default {
       },
     };
   },
-  created() {},
+  created() {
+  },
   mounted() {
-    // TODO 获取配置信息
-    let conf = {}
-
-    this.init(null, conf);
     this.$refs['typeSelect'].open();
   },
   methods: {
+    typeSelect(selectType, xml) {
+      this.selectType = selectType;
+      let config = {
+        additionalModules: []
+      };
+
+      let prefabricationPaletteExtendParam = {
+        'ref:separator:top': 'ref',
+      };
+
+      selectType.childNode.forEach((item) => {
+        prefabricationPaletteExtendParam['create.ref-service_task' + item.id] = {
+          type: 'refBpmn:RefServiceTask',
+          group: 'ref' + item.id,
+          title: 'Create {' + item.moduleName + '} Type Reference ServiceTask',
+          className: 'ttttt0',
+          icoImageUrl: item.icon,
+          shapeImageUrl: item.preview,
+          index: item.id
+        }
+      })
+      config.additionalModules.push({
+        prefabricationPaletteExtendParam: ['value', Object.assign(prefabricationPaletteExtendParam)]
+      })
+
+      this.init(xml, config)
+    },
+
+    /**
+     * 初始化Bpmn图
+     * @param xml
+     * @param conf
+     */
     init(xml, conf) {
       let props = this.bpmnProp;
       let that = this;
@@ -110,6 +143,7 @@ export default {
           PrefabricationTranslateModule,
           PrefabricationPaletteModule,
           PrefabricationReaderModule,
+          ...conf?.additionalModules ?? []
         ],
         moddleExtensions: {
           ...PrefabricationModuleDescriptor,
@@ -122,19 +156,28 @@ export default {
       that.importXML(props.bpmn, xml)
     },
 
-    importXML(bpmn, xml) {
+    /**
+     * XML导入Bpmn的验证和导入操作
+     * @param bpmn
+     * @param xml
+     */
+   async importXML(bpmn, xml) {
       if (xml) {
         bpmn.importXML(xml);
       } else {
         if (bpmn.createDiagram) {
-          bpmn.createDiagram();
+          await (bpmn.createDiagram()).then(()=>{
+            bpmn.get('elementRegistry').updateId(bpmn.get('canvas').getRootElements()[0],'Process_' + (Date.now()).valueOf());
+          })
         }
       }
     },
 
+    /**
+     * 一些固定需要的监听方法
+     */
     initListeners() {
       let props = this.bpmnProp;
-      console.log(props.modules.eventBus)
       // 监听视图缩放变化
       props.modules.eventBus.on("canvas.viewbox.changed", ({viewbox}) => {
         this.$emit("canvas-viewbox-changing", {viewbox});
@@ -153,8 +196,7 @@ export default {
       // });
 
       props.modules.eventBus.on("selection.changed", (event) => {
-        console.log(event)
-        this.selectElements = event.newSelection;
+        this.selectElements = event.newSelection.length ? event.newSelection : this.bpmnProp.modules.canvas.getRootElements();
       });
 
       props.modules.eventBus.on("connection.changed", ({element}) => {
@@ -191,7 +233,7 @@ export default {
       })
 
       props.modules.eventBus.on("element.changed", ({element}) => {
-        let type = element.type;
+        let type = element.type ?? "";
         if (type.includes("StartEvent") || type.includes("EndEvent")) {
           let haveBegin = false;
           let havaEnd = false;
@@ -220,6 +262,38 @@ export default {
       })
     },
 
+    /**
+     * 用于同步两个内容的值，当前用于分支的线条自动取反
+     * @param first
+     * @param second
+     */
+    synchronousCondition(first, second) {
+      if (first && second) {
+        let firstName = first.businessObject.name;
+        let secondName = second.businessObject.name;
+        if ((firstName ? (firstName == 'true' ? 'false' : 'true') : null) != secondName) {
+          if (firstName) {
+            this.bpmnProp.modules.modeling.updateProperties(second, {
+              "name": (firstName == 'true' ? 'false' : 'true'),
+            })
+          } else if (secondName) {
+            this.bpmnProp.modules.modeling.updateProperties(first, {
+              "name": (secondName == 'true' ? 'false' : 'true'),
+            })
+          }
+        }
+      } else if (!first.businessObject.name) {
+        this.bpmnProp.modules.modeling.updateProperties(first, {
+          "name": 'true',
+        })
+      }
+    },
+
+    /**
+     * 删除一个元素的实现
+     * @param element
+     * @param message
+     */
     removeCollection(element, message) {
       if (element.constructor.name === 'Shape') {
         this.bpmnProp.modules.canvas._removeElement(element, "shape")
@@ -244,43 +318,32 @@ export default {
       }
     },
 
-    synchronousCondition(first, second) {
-      if (first && second) {
-        let firstName = first.businessObject.name;
-        let secondName = second.businessObject.name;
-        // if (firstName != ("!(" + secondName + ")") && ("!(" + firstName + ")") != secondName) {
-        //   // if (firstName) {
-        //   //   console.log("SetSecond")
-        //   //   this.modeler.get("modeling").updateProperties(second, {
-        //   //     "name": this.reverseCondition(firstName),
-        //   //   })
-        //   // } else {
-        //   //   if (secondName) {
-        //   //     console.log("SetFirst")
-        //   //     this.modeler.get("modeling").updateProperties(first, {
-        //   //       "name": this.reverseCondition(secondName),
-        //   //     })
-        //   //   }
-        //   // }
-        // }
-      }
-    },
-
+    /**
+     * 复制当前Bpmn组件视图的内容，并复制到电脑的裁剪板中
+     */
     selectAllAndCopy() {
-      let modules = this.bpmnProp.modules;
-      modules.editorActions.trigger("selectElements");
-      modules.editorActions.trigger("copy");
+      let editorActions = this.bpmnProp.modules.editorActions;
+      // 选中全部
+      editorActions.trigger("selectElements");
+      // 复制到Bpmn内部
+      editorActions.trigger("copy");
+      // 将Bpmn内容数据导出到裁剪板
       this.globalCopy();
     },
 
-    // 全局复制
+    /**
+     * 将Bpmn内容剪切板中的内容复制到电脑的剪切板中
+     */
     globalCopy() {
       let modules = this.bpmnProp.modules;
       // 复制到计算机裁剪板
       navigator.clipboard.writeText(JSON.stringify(modules.clipboard.get()));
     },
 
-    // 全局粘贴
+    /**
+     * TODO 未完全实现
+     * 全局粘贴
+     */
     globalPaste() {
       let modules = this.bpmnProp.modules;
       // 复制到计算机裁剪板
@@ -297,30 +360,35 @@ export default {
     },
 
     /**
+     * 给定元素并将其修改颜色
+     * @param color
+     * @param element
+     */
+    changeColor(color, ...element) {
+      this.bpmnProp.modules.modeling.setColor([...element], color);
+    },
+
+    /**
      * 修改元素的属性
      * @param event
      * @param type
      */
-    changeField(event, type) {
-      // TODO 判断是否完整 this.selectElement
-      let isImperfect = true;
-      let isUnSave = true;
+    changeField(element, type) {
+      let isImperfect = false;
+      let isUnSave = false;
       let isUnCheck = true;
       let isSuccess = true;
       if (isImperfect) {
-        this.changeColor(this.elementColorEnum.imperfect, this.selectElement)
+        this.changeColor(this.elementColorEnum.imperfect, element)
       } else if (isUnSave) {
-        this.changeColor(this.elementColorEnum.unSave, this.selectElement)
+        this.changeColor(this.elementColorEnum.unSave, element)
       } else if (isUnCheck) {
-        this.changeColor(this.elementColorEnum.unCheck, this.selectElement)
+        this.changeColor(this.elementColorEnum.unCheck, element)
       } else if (isSuccess) {
-        this.changeColor(this.elementColorEnum.complete, this.selectElement)
+        this.changeColor(this.elementColorEnum.complete, element)
       }
     },
 
-    changeColor(color, ...element) {
-      this.bpmnProp.bpmn.get('modeling').setColor([element], color);
-    },
     out() {
 
     }
@@ -361,10 +429,5 @@ export default {
 .properties-panel-parent > .djs-properties-panel {
   padding-bottom: 70px;
   min-height: 100%;
-}
-
-.aaa111:after {
-  display: inline;
-  content: '123';
 }
 </style>

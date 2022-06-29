@@ -33,17 +33,16 @@ PrefabricationPaletteProvider.prototype.getPaletteEntries = function () {
 
     function createAction({
                               type, group = 'prefabrication', className = 'bpmn-icon-subprocess-expanded',
-                              title, icoImageUrl = null, options
+                              title, icoImageUrl = null, options, index
                           }) {
 
         function createListener(event) {
-            var shape = elementFactory.createShape(assign({type: type}, options));
+            var shape = elementFactory.createShape(assign({type: type, index: index}, options));
 
             if (options) {
                 var di = getDi(shape);
-                di.isExpanded = options.isExpanded;
+                di.isExpanded = options.isExpanded ? options.isExpanded : di.isExpanded;
             }
-
             create.start(event, shape);
         }
 
