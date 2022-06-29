@@ -2,11 +2,13 @@
   <div>
     <el-container>
       <el-aside width="220px">
-        <Menu :routes="route" :isCollapse="collapse" />
+        <Menu :routes="route"
+          :isCollapse="collapse" />
       </el-aside>
       <el-container>
         <el-header>
-          <el-dropdown @command="handleCommand" trigger="click">
+          <el-dropdown @command="handleCommand"
+            trigger="click">
             <span class="el-dropdown-link">
               <el-avatar :src="avatar"></el-avatar>
               <i class="el-icon-arrow-down el-icon--right"></i>
@@ -46,7 +48,7 @@ export default {
     handleCommand(command) {
       console.log(command);
       if (command == 'b') {
-        localStorage.removeItem('userInfo');
+        sessionStorage.removeItem('userInfo');
         this.$router.push('/login');
       }
     },
