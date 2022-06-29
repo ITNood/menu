@@ -150,29 +150,33 @@ export default {
       this.trayLength = `${data.width / 1000}m X ${data.height / 1000}m X ${
         data.depth / 1000
       }m`;
-      this.orders = data.Order.join(',');
+      this.orders = data.Order.join(' , ');
       this.ordersTotal = data.total_order;
       this.volumeUse = `${data.volume_util * 100}%`;
       this.heightUse = `${data.depth_util * 100}%`;
     },
     //选择托盘编号
     change(val) {
-      console.log(val);
       this.numberkpi = val;
       const data = datas._Container;
       const arr = data._Goods.filter((e) => e.name == val);
       const arr1 = data._Goods.filter((e) => e.name !== val);
       arr1.unshift(...arr);
-      console.log('***********', arr);
       data._Goods = arr1;
       this.getTrayNew(data._Goods[0]);
     },
     //上一个
     prev() {},
     //播放暂停
-    player() {},
+    player() {
+      this.play = !this.play;
+      this.isshow = false;
+      console.log(this.play);
+    },
     //重置
-    reset() {},
+    reset() {
+      this.isshow = true;
+    },
     //下一个
     next() {},
   },
