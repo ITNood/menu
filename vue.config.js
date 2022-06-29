@@ -22,7 +22,7 @@ module.exports = {
   devServer: {
     open: true,//服务启动时自动在浏览器打开
     //局域网访问
-    host: '10.17.10.77', //host改成自己的IP
+    host: '10.17.10.155', //host改成自己的IP
     port: 8080,//端口
     overlay: {
       warning: false,
@@ -30,7 +30,7 @@ module.exports = {
     },
     proxy: {
       '/api': {
-        target: 'http://10.17.10.150:8082', //后端接口地址
+        target: 'http://10.17.10.109:8080', //后端接口地址
         changeOrigin: true, //是否允许跨越
         pathRewrite: {
           '^/api': '', //重写,
