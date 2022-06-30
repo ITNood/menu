@@ -36,6 +36,13 @@ module.exports = {
           '^/api': '', //重写,
         }
       },
+      '/server': {
+        target: 'http://10.17.10.222:8080', //后端接口地址
+        changeOrigin: true, //是否允许跨越
+        pathRewrite: {
+          '^/server': '', //重写,
+        }
+      },
     }
   },
 }
