@@ -29,10 +29,12 @@
       <el-button icon="el-icon-download"
         class="btn"
         type="primary"
+        @click="exportJson"
         plain>导出数据(.json)</el-button>
       <el-button icon="el-icon-download"
         class="btn"
         type="primary"
+        @click="exportCsv"
         plain>导出数据(.csv)</el-button>
     </el-button-group>
 
@@ -67,6 +69,7 @@
 </template>
 
 <script>
+import { handleDownloadCSV, saveJSON } from '../js/export';
 export default {
   name: 'BoxNews',
   props: [
@@ -89,13 +92,27 @@ export default {
     'lengthNumber',
     'total',
     'play',
+    'arrayData',
   ],
   data() {
-    return {};
+    return {
+      data: '',
+    };
   },
-  created() {},
+  created() {
+    this.data = this.arrayData._Container._Goods[0];
+  },
   mounted() {},
   methods: {
+    //导出csv
+    exportCsv() {
+      handleDownloadCSV(this.data.Box);
+    },
+    //导出json
+    exportJson() {
+      saveJSON(this.data, '数据');
+    },
+
     prev() {
       this.$emit('prev');
     },
