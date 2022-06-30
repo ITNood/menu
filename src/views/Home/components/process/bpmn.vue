@@ -118,7 +118,6 @@ export default {
       };
 
       selectType.childNode.forEach((item) => {
-        console.log('-------------', item);
         prefabricationPaletteExtendParam['create.ref-service_task' + item.id] =
           {
             type: 'refBpmn:RefServiceTask',

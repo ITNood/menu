@@ -25,7 +25,7 @@
         <li><span>坐标</span>{{coordinate}}</li>
       </ul>
     </div>
-    <el-button-group class="button-group">
+    <!-- <el-button-group class="button-group">
       <el-button icon="el-icon-download"
         class="btn"
         type="primary"
@@ -36,7 +36,7 @@
         type="primary"
         @click="exportCsv"
         plain>导出数据(.csv)</el-button>
-    </el-button-group>
+    </el-button-group> -->
 
     <!----动态展示-->
     <div class="show">
