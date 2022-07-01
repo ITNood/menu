@@ -39,7 +39,6 @@
               </el-card>
             </el-col>
           </el-row>
-
         </el-col>
         <el-col :span="4">
           <el-col>

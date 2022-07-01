@@ -20,7 +20,7 @@ const Axios = axios.create({
 Axios.interceptors.request.use(
   config => {
     // load = Loading.service({ fullscreen: true, text: 'Loading...' })
-    const token = localStorage.getItem('token')
+    const token = sessionStorage.getItem('token')
     // const lang = localStorage.getItem('lang')
     if (token) {
       config.headers.Token = token
@@ -40,7 +40,7 @@ Axios.interceptors.response.use(
     //判断登录状态，跳转路由
     if (response.data.code === 500) {//退出登录
       this.$message.info(response.data.msg)
-      localStorage.removeItem('token')
+      sessionStorage.removeItem('token')
       this.$router.push('/')
     } else if (response.data.code === 400) {//返回错误
       this.$message.danger(response.data.msg)

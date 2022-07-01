@@ -24,6 +24,7 @@
       @player="player"
       @reset="reset"
       @next="next" />
+
     <canvas-img :arrayData="array" />
 
     <tray-kpi :value="numberkpi"
