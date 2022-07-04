@@ -9,7 +9,7 @@ export default {
     return {};
   },
   created() {
-    const info = sessionStorage.getItem('userInfo');
+    const info = sessionStorage.getItem('token');
     console.log(info);
     if (!info) {
       this.$router.push('/login');
