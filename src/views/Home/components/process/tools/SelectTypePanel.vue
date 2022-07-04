@@ -1,35 +1,35 @@
 <template>
   <div>
     <el-dialog title="选择流程"
-               :visible.sync="dialogVisible"
-               width="90%"
-               :close-on-click-modal="false"
-               :close-on-press-escape="false"
-               :show-close="false"
-               append-to-body>
+      :visible.sync="dialogVisible"
+      width="90%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      append-to-body>
 
       <!-- 面包屑 / 当前所在位置导航 -->
       <el-row>
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item v-for="(item,index) in breadcrumb"
-                              :key="index">
+            :key="index">
             <a v-on:click="choiceTypeByNameClick(item,index)">{{ item }}</a>
           </el-breadcrumb-item>
         </el-breadcrumb>
       </el-row>
 
-      <!-- 导航下的分割线 -->
       <el-divider></el-divider>
 
-      <!-- 主面板 -->
       <el-row>
-        <!-- 左侧为类型选择区域 -->
         <el-col :span="20">
+          <!-- <el-cascader placeholder="试试搜索：指南"
+            :options="options"
+            filterable></el-cascader> -->
           <el-row v-if="selectTypes && selectTypes.status && selectTypes.status === 'Active'">
             <el-col :span="4"
-                    v-for="(element, index) in selectTypes.childNode"
-                    :key="index"
-                    :offset="index%4 > 0 ? 2 : 1">
+              v-for="(element, index) in selectTypes.childNode"
+              :key="index"
+              :offset="index%4 > 0 ? 2 : 1">
               <el-card :shadow="(element.status && element.status === 'Active')?'hover':'never'">
                 <div v-on:click="choiceTypeClick(element)">
                   <div style="padding: 14px;text-align: center; ">
@@ -39,55 +39,49 @@
               </el-card>
             </el-col>
           </el-row>
-
-          <!-- 左下半部分展示已选择的类型信息 -->
-          <el-row>
-
-          </el-row>
         </el-col>
         <el-col :span="4">
           <el-col>
             <el-button type="text"
-                       icon="el-icon-plus"
-                       @click="onSelect(null)">创建一个新的流程
+              icon="el-icon-plus"
+              @click="onSelect(null)">创建一个新的流程
             </el-button>
           </el-col>
           <el-col>
             <el-button type="text"
-                       icon="el-icon-star-on"
-                       @click="selectTemplate">选择模板
+              icon="el-icon-star-on"
+              @click="selectTemplate">选择模板
             </el-button>
           </el-col>
           <el-col>
             <el-button type="text"
-                       icon="el-icon-search"
-                       @click="selectHistory">使用历史流程
+              icon="el-icon-search"
+              @click="selectHistory">使用历史流程
             </el-button>
           </el-col>
         </el-col>
       </el-row>
 
-      <!-- TODO 测试完成后删除 -->
       <span slot="footer"
-            class="dialog-footer">
+        class="dialog-footer">
         <el-button @click="dialogVisible = false">{{ $t('el.messagebox.cancel') }}</el-button>
         <el-button type="primary"
-                   @click="dialogVisible = false">{{ $t('el.messagebox.confirm') }}</el-button>
+          @click="dialogVisible = false">{{ $t('el.messagebox.confirm') }}</el-button>
       </span>
     </el-dialog>
-    <banner ref="selectProcessBanner"/>
+    <banner ref="selectProcessBanner" />
   </div>
 </template>
 
 <script>
 import 'element-ui/lib/theme-chalk/base.css';
-import {list} from '@/api/process/menu'
+import { list } from '@/api/process/menu';
 import Banner from '../../banner/index.vue';
 
 // 用于选择流程类型和配置相关属性
 export default {
   name: 'SelectTypePanel',
-  components: {Banner},
+  components: { Banner },
   data() {
     return {
       dialogVisible: false,
@@ -95,6 +89,8 @@ export default {
       types: [],
       selectTypes: {},
       breadcrumb: [],
+      options: [],
+      value: '',
     };
   },
   created() {
@@ -103,11 +99,12 @@ export default {
     // this.types = HTTPResponse();
     const that = this;
 
-    list().then((response) => {
-      that.types = response.data
-    }).then(() =>
-        that.choiceTypeClick(that.types[0])
-    )
+    list()
+      .then((response) => {
+        that.types = response.data;
+        console.log(response.data);
+      })
+      .then(() => that.choiceTypeClick(that.types[0]));
   },
   methods: {
     open() {
@@ -126,7 +123,7 @@ export default {
       if (index != 0) {
         for (let sliceElement of [...this.breadcrumb.slice(1, index + 1)]) {
           let findItem = selectTypes.childNode.find(
-              (i) => i.moduleName == sliceElement
+            (i) => i.moduleName == sliceElement
           );
           if (findItem) {
             selectTypes = findItem;

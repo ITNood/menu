@@ -15,8 +15,22 @@
             type="password"
             v-model="loginForm.password"></el-input>
         </el-form-item>
+
+        <el-row :gutter="15">
+          <el-col :span="16">
+            <el-form-item label="验证码"
+              prop="code">
+              <el-input placeholder="请输入验证码"
+                type="code"
+                v-model="loginForm.code"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8"><img :src="src" /></el-col>
+        </el-row>
+
         <el-row>
-          <el-col :offset="10">
+          <el-col :offset="
+              10">
             <el-button :loading="loading"
               type="primary"
               @click="login"
@@ -36,7 +50,9 @@ export default {
       loginForm: {
         username: 'admin',
         password: '111111',
+        code: '',
       },
+      src: '',
       loading: false,
     };
   },
