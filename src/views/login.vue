@@ -25,7 +25,7 @@
                 v-model="loginForm.code"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="8"><img :src="src" /></el-col>
+          <el-col :span="8"><img :src="codeUrl"  @click="getCode"/></el-col>
         </el-row>
 
         <el-row>
@@ -44,29 +44,82 @@
 </template>
 
 <script>
+import Cookies from "js-cookie";
+import {encrypt,decrypt} from "@/utils/jsencrypt";
+import {getCodeImg,login} from "@/api/login";
+
 export default {
   data() {
     return {
       loginForm: {
         username: 'admin',
         password: '111111',
+        rememberMe: false,
         code: '',
+        uuid: ""
       },
       src: '',
+      codeUrl: "",
       loading: false,
     };
   },
-  created() {},
+  created() {
+    this.getCode();
+    this.getCookie();
+  },
   mounted() {},
   methods: {
+    getCode() {
+      getCodeImg().then(res => {
+        this.captchaOnOff = res.data.captchaOnOff === undefined ? true : res.data.captchaOnOff;
+        if (this.captchaOnOff) {
+          this.codeUrl = "data:image/gif;base64," + res.data.img;
+          this.loginForm.uuid = res.data.uuid;
+        }
+      });
+    },
+    getCookie() {
+      const username = Cookies.get("username");
+      const password = Cookies.get("password");
+      const rememberMe = Cookies.get('rememberMe')
+      this.loginForm = {
+        username: username === undefined ? this.loginForm.username : username,
+        password: password === undefined ? this.loginForm.password : decrypt(password),
+        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
+      };
+    },
     login() {
-      this.loading = true;
-      const info = '498498484';
-      sessionStorage.setItem('userInfo', JSON.stringify(info));
-      setTimeout(() => {
-        this.loading = false;
-        this.$router.push({ path: '/home' }, () => {});
-      }, 1000);
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.loading = true;
+          if (this.loginForm.rememberMe) {
+            Cookies.set("username", this.loginForm.username, { expires: 30 });
+            Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
+            Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
+          } else {
+            Cookies.remove("username");
+            Cookies.remove("password");
+            Cookies.remove('rememberMe');
+          }
+          // login(this.loginForm).then(() => {
+          //   console.log("PKL")
+            this.$router.push('/home')
+            // this.$router.push({ path: this.redirect || "/home" }).catch(()=>{});
+          // }).catch(() => {
+          //   this.loading = false;
+          //   if (this.captchaOnOff) {
+          //     this.getCode();
+          //   }
+          // });
+        }
+      });
+      // this.loading = true;
+      // const info = '498498484';
+      // sessionStorage.setItem('userInfo', JSON.stringify(info));
+      // setTimeout(() => {
+      //   this.loading = false;
+      //   this.$router.push({ path: '/home' }, () => {});
+      // }, 1000);
     },
   },
 };

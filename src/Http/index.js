@@ -8,7 +8,7 @@ Vue.use(Router)
 // 创建axios实例
 const Axios = axios.create({
   // http://10.17.10.222:8080
-  baseURL: process.env.NODE_ENV === 'production' ? "http://10.17.10.222:8080" : "/api/",
+  baseURL: process.env.NODE_ENV === 'production' ? "http://10.17.10.222:8080" : "",
   // baseURL: "/api",
   //baseURL:'http://www.hxfc.com/',
   timeout: 10000,//超时请求
