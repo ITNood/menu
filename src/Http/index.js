@@ -1,8 +1,7 @@
 import axios from 'axios'
 import { Loading, Message } from 'element-ui'
-import Vue from 'vue'
-import Router from 'vue-router'
-Vue.use(Router)
+// import Router from 'vue-router'
+// Vue.use(Router)
 
 // 创建axios实例
 const Axios = axios.create({
