@@ -23,7 +23,7 @@ Axios.interceptors.request.use(
     const token = sessionStorage.getItem('token')
     // const lang = localStorage.getItem('lang')
     if (token) {
-      config.headers.Token = token
+      config.headers.Authorization = token
       // config.headers.lang = lang
     }
     return config
@@ -36,6 +36,7 @@ Axios.interceptors.request.use(
 // 拦截所有的 api 响应，可以实现自动弹窗报错
 Axios.interceptors.response.use(
   response => {   // when HTTP_STATUS in [ 200 , 299 ]
+    console.log("response",this)
     // load.close()
     //判断登录状态，跳转路由
     if (response.data.code === 500) {//退出登录

@@ -1,31 +1,16 @@
 <template>
   <div>
-    <header-buttons size="mini"
-      type="primary"
-      v-model="bpmnProp.zoom"
-      v-if="bpmnProp.bpmn"
-      :bpmn="bpmnProp.bpmn"
-      :min-zoom="0.1"
-      :max-zoom="4" />
-    <div class="containers"
-      ref="containers">
-      <div class="canvas"
-        ref="canvas"
-        id="canvas"></div>
-      <div class="properties-panel-parent"
-        id="js-properties-panel"></div>
-
-      <right-menu @toggleFlow="out"
-        :panel-types="selectType"
-        :elements="selectElements"
-        :bpmn="bpmnProp.bpmn"
-        @changeField="changeField" />
+    <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn" :bpmn="bpmnProp.bpmn"
+                    :min-zoom="0.1" :max-zoom="4"/>
+    <div class="containers" ref="containers">
+      <div class="canvas" ref="canvas" id="canvas"></div>
+      <div class="properties-panel-parent" id="js-properties-panel"></div>
+      <right-menu @toggleFlow="out" :panel-types="selectType" :elements="selectElements" :bpmn="bpmnProp.bpmn"
+                  @changeField="changeField"/>
     </div>
-    <select-type-panel ref="typeSelect"
-      @onSelect="typeSelect" />
+    <select-type-panel ref="typeSelect" @onSelect="typeSelect"/>
   </div>
 </template>
-
 <script>
 /**
  * CSS
@@ -54,7 +39,7 @@ export default {
   name: 'bpmn',
 
   //
-  components: { SelectTypePanel, HeaderButtons, RightMenu },
+  components: {SelectTypePanel, HeaderButtons, RightMenu},
 
   data() {
     return {
@@ -102,41 +87,16 @@ export default {
       },
     };
   },
-  created() {},
+  created() {
+  },
   mounted() {
     this.$refs['typeSelect'].open();
   },
   methods: {
     typeSelect(selectType, xml) {
       this.selectType = selectType;
-      let config = {
-        additionalModules: [],
-      };
 
-      let prefabricationPaletteExtendParam = {
-        'ref:separator:top': 'ref',
-      };
-
-      selectType.childNode.forEach((item) => {
-        prefabricationPaletteExtendParam['create.ref-service_task' + item.id] =
-          {
-            type: 'refBpmn:RefServiceTask',
-            group: 'ref' + item.id,
-            title: item.moduleName,
-            className: 'ttttt0',
-            icoImageUrl: item.icon,
-            shapeImageUrl: item.preview,
-            index: item.id,
-          };
-      });
-      config.additionalModules.push({
-        prefabricationPaletteExtendParam: [
-          'value',
-          Object.assign(prefabricationPaletteExtendParam),
-        ],
-      });
-
-      this.init(xml, config);
+      this.init(xml, selectType.bpmnConf);
     },
 
     /**
@@ -154,7 +114,7 @@ export default {
 
       props.bpmn = new BpmnModeler({
         container: that.$refs[props.container],
-        keyboard: props.keyboard ?? { bindTo: props.keyboardDefaultBindTo },
+        keyboard: props.keyboard ?? {bindTo: props.keyboardDefaultBindTo},
         additionalModules: [
           PrefabricationTranslateModule,
           PrefabricationPaletteModule,
@@ -167,7 +127,7 @@ export default {
         },
       });
       Object.keys(props.modules).forEach(
-        (key) => (props.modules[key] = props.bpmn.get(key))
+          (key) => (props.modules[key] = props.bpmn.get(key))
       );
 
       that.initListeners();
@@ -186,11 +146,11 @@ export default {
         if (bpmn.createDiagram) {
           await bpmn.createDiagram().then(() => {
             bpmn
-              .get('elementRegistry')
-              .updateId(
-                bpmn.get('canvas').getRootElements()[0],
-                'Process_' + Date.now().valueOf()
-              );
+                .get('elementRegistry')
+                .updateId(
+                    bpmn.get('canvas').getRootElements()[0],
+                    'Process_' + Date.now().valueOf()
+                );
           });
         }
       }
@@ -202,9 +162,9 @@ export default {
     initListeners() {
       let props = this.bpmnProp;
       // 监听视图缩放变化
-      props.modules.eventBus.on('canvas.viewbox.changed', ({ viewbox }) => {
-        this.$emit('canvas-viewbox-changing', { viewbox });
-        const { scale } = viewbox;
+      props.modules.eventBus.on('canvas.viewbox.changed', ({viewbox}) => {
+        this.$emit('canvas-viewbox-changing', {viewbox});
+        const {scale} = viewbox;
         props.zoom = Math.floor(scale * 100) / 100;
       });
 
@@ -220,92 +180,92 @@ export default {
 
       props.modules.eventBus.on('selection.changed', (event) => {
         this.selectElements = event.newSelection.length
-          ? event.newSelection
-          : this.bpmnProp.modules.canvas.getRootElements();
+            ? event.newSelection
+            : this.bpmnProp.modules.canvas.getRootElements();
       });
 
-      props.modules.eventBus.on('connection.changed', ({ element }) => {
+      props.modules.eventBus.on('connection.changed', ({element}) => {
         let type = element.type;
         let source = element.source;
         let target = element.target;
         if (source.type.includes('StartEvent')) {
           if (source.outgoing.length > 1) {
             this.removeCollection(
-              element,
-              this.$createElement(
-                'i',
-                { style: 'color: teal' },
-                '开始点仅可对应一个目标内容'
-              )
+                element,
+                this.$createElement(
+                    'i',
+                    {style: 'color: teal'},
+                    '开始点仅可对应一个目标内容'
+                )
             );
           }
         } else if (source.type.includes('EndEvent')) {
           this.removeCollection(
-            element,
-            this.$createElement('i', { style: 'color: teal' }, '当前节点已结束')
+              element,
+              this.$createElement('i', {style: 'color: teal'}, '当前节点已结束')
           );
         } else if (source.type.includes('Gateway')) {
           if (source.outgoing.length > 2) {
             this.removeCollection(
-              element,
-              this.$createElement(
-                'i',
-                { style: 'color: teal' },
-                '条件仅可使用“是”，“否”两个分支'
-              )
+                element,
+                this.$createElement(
+                    'i',
+                    {style: 'color: teal'},
+                    '条件仅可使用“是”，“否”两个分支'
+                )
             );
           } else if (target.type.includes('Gateway')) {
             this.removeCollection(
-              element,
-              this.$createElement(
-                'i',
-                { style: 'color: teal' },
-                '不可重复巡回节点，此操作将会死循环'
-              )
+                element,
+                this.$createElement(
+                    'i',
+                    {style: 'color: teal'},
+                    '不可重复巡回节点，此操作将会死循环'
+                )
             );
           } else {
             this.synchronousCondition(
-              element,
-              source.outgoing[source.outgoing.indexOf(element) == 0 ? 1 : 0]
+                element,
+                source.outgoing[source.outgoing.indexOf(element) == 0 ? 1 : 0]
             );
           }
         } else if (source.type.includes('Task')) {
           if (source.outgoing.length > 1) {
             this.removeCollection(
-              element,
-              this.$createElement(
-                'i',
-                { style: 'color: teal' },
-                '任务仅可有一个目标内容'
-              )
+                element,
+                this.$createElement(
+                    'i',
+                    {style: 'color: teal'},
+                    '任务仅可有一个目标内容'
+                )
             );
           }
         } else if (source.type.includes('ThrowEvent')) {
           if (source.outgoing.length > 1) {
             this.removeCollection(
-              element,
-              this.$createElement(
-                'i',
-                { style: 'color: teal' },
-                '中间输出操作仅可有一个目标内容'
-              )
+                element,
+                this.$createElement(
+                    'i',
+                    {style: 'color: teal'},
+                    '中间输出操作仅可有一个目标内容'
+                )
             );
           }
         } else if (source.type.includes('SubProcess')) {
           if (source.outgoing.length > 1) {
             this.removeCollection(
-              element,
-              this.$createElement(
-                'i',
-                { style: 'color: teal' },
-                '子任务结束后仅可有一个目标内容'
-              )
+                element,
+                this.$createElement(
+                    'i',
+                    {style: 'color: teal'},
+                    '子任务结束后仅可有一个目标内容'
+                )
             );
           }
         }
       });
 
-      props.modules.eventBus.on('element.changed', ({ element }) => {
+      props.modules.eventBus.on('element.changed', ({element}) => {
         let type = element.type ?? '';
         if (type.includes('StartEvent') || type.includes('EndEvent')) {
           let haveBegin = false;
@@ -317,12 +277,12 @@ export default {
               if (itemType.includes('StartEvent')) {
                 if (haveBegin) {
                   this.removeCollection(
-                    element,
-                    this.$createElement(
-                      'i',
-                      { style: 'color: teal' },
-                      '每个层级仅可包含一个开始和一个结束'
-                    )
+                      element,
+                      this.$createElement(
+                          'i',
+                          {style: 'color: teal'},
+                          '每个层级仅可包含一个开始和一个结束'
+                      )
                   );
                   break;
                 } else {
@@ -331,12 +291,12 @@ export default {
               } else if (itemType.includes('EndEvent')) {
                 if (havaEnd) {
                   this.removeCollection(
-                    element,
-                    this.$createElement(
-                      'i',
-                      { style: 'color: teal' },
-                      '每个层级仅可包含一个开始和一个结束'
-                    )
+                      element,
+                      this.$createElement(
+                          'i',
+                          {style: 'color: teal'},
+                          '每个层级仅可包含一个开始和一个结束'
+                      )
                   );
                   break;
                 } else {
@@ -359,8 +319,8 @@ export default {
         let firstName = first.businessObject.name;
         let secondName = second.businessObject.name;
         if (
-          (firstName ? (firstName == 'true' ? 'false' : 'true') : null) !=
-          secondName
+            (firstName ? (firstName == 'true' ? 'false' : 'true') : null) !=
+            secondName
         ) {
           if (firstName) {
             this.bpmnProp.modules.modeling.updateProperties(second, {
@@ -479,19 +439,18 @@ export default {
       }
     },
 
-    out() {},
+    out() {
+    },
   },
 };
 </script>
-
 <style lang="less">
 .containers {
   height: calc(100vh - 160px);
   position: relative;
 
   .canvas {
-    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+')
-      repeat !important;
+    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+') repeat !important;
     height: 100%;
   }
 }
