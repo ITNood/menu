@@ -26,6 +26,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="8"><img :src="codeUrl"
+              style="height: 40px;"
               @click="getCode" /></el-col>
         </el-row>
 
@@ -45,9 +46,9 @@
 </template>
 
 <script>
-// import Cookies from 'js-cookie';
-import { encrypt, decrypt } from '@/utils/jsencrypt';
-import { getCodeImg, login } from '@/api/login';
+import Cookies from 'js-cookie';
+import { encrypt, decrypt } from '../utils/jsencrypt';
+import { getCodeImg, login } from '../api/login';
 
 export default {
   data() {
@@ -59,7 +60,6 @@ export default {
         code: '',
         uuid: '',
       },
-      src: '',
       codeUrl: '',
       loading: false,
     };
@@ -109,8 +109,10 @@ export default {
               sessionStorage.setItem('token', JSON.stringify(res.data.token));
               console.log(res);
               // location.href='/home'
-              this.$router.push('/home');
-              // this.$router.push({ path: this.redirect || "/home" }).catch(()=>{});
+              // this.$router.push('/home');
+              this.$router
+                .push({ path: this.redirect || '/home' })
+                .catch(() => {});
             })
             .catch(() => {
               if (this.captchaOnOff) {
