@@ -19,13 +19,13 @@
         </el-form-item>
         <el-form-item label="开始时间"
           prop="deployTime">
-          <el-date-picker clearable
+          <!-- <el-date-picker clearable
             size="small"
             v-model="queryParams.deployTime"
             type="date"
             value-format="yyyy-MM-dd"
             placeholder="选择时间">
-          </el-date-picker>
+          </el-date-picker> -->
         </el-form-item>
         <el-form-item>
           <el-button type="primary"

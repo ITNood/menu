@@ -35,18 +35,18 @@ Axios.interceptors.request.use(
 )
 // 拦截所有的 api 响应，可以实现自动弹窗报错
 Axios.interceptors.response.use(
-  response => {   // when HTTP_STATUS in [ 200 , 299 ]
-    console.log("response",this)
+  response => {   // when HTTP_STATUS in [ 200 , 299 ]c
+    console.log('response', response)
     // load.close()
     //判断登录状态，跳转路由
-    if (response.data.code === 500) {//退出登录
+    if (response.data.code == 500) {//退出登录
       this.$message.info(response.data.msg)
       sessionStorage.removeItem('token')
       this.$router.push('/')
-    } else if (response.data.code === 400) {//返回错误
+    } else if (response.data.code == 400) {//返回错误
       this.$message.danger(response.data.msg)
       return Promise.resolve(response.data)
-    } else if (response.data.code === 200) {//code===200返回数据
+    } else if (response.data.code == 200) {//code===200返回数据
       return Promise.resolve(response.data);
     }
   },
