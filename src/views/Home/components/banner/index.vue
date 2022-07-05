@@ -51,6 +51,8 @@
 <script>
 // import ProcessViewer from '../ProcessViewer';
 // import { listDefinition } from '@/api/workflow/definition';
+import {list as processList} from '@/api/process';
+
 export default {
   name: 'Banner',
   // components: {
@@ -127,17 +129,17 @@ export default {
       //       return { version: item.version };
       //     });
       // })
-      // listDefinition(data).then((response) => {
-      //   this.show = true;
-      //   console.log(response);
-      //   this.items = response.rows;
-      //   //默认第一个
-      //   this.newForm.idName = response.rows[0].processName;
-      //   this.newForm.version = response.rows[0].version;
-      //   this.lists = response.rows[0].vesrionsList.rows.map((item) => {
-      //     return { version: item.version };
-      //   });
-      // });
+      processList(data).then((response) => {
+        this.show = true;
+        console.log(response);
+        this.items = response.rows;
+        //默认第一个
+        this.newForm.idName = response.rows[0].processName;
+        this.newForm.version = response.rows[0].version;
+        this.lists = response.rows[0].vesrionsList.rows.map((item) => {
+          return { version: item.version };
+        });
+      });
     },
     createViewer(container,xml){
 

@@ -54,7 +54,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111',
+        password: 'admin123',
         rememberMe: false,
         code: '',
         uuid: '',
@@ -106,18 +106,19 @@ export default {
           // }
           login(this.loginForm)
             .then((res) => {
-              // console.log('PKL');
-              // this.$router.push('/home');
               sessionStorage.setItem('token', JSON.stringify(res.data.token));
-              this.$router
-                .push({ path: this.redirect || '/home' })
-                .catch(() => {});
+              console.log(res);
+              // location.href='/home'
+              this.$router.push('/home');
+              // this.$router.push({ path: this.redirect || "/home" }).catch(()=>{});
             })
             .catch(() => {
-              this.loading = false;
               if (this.captchaOnOff) {
                 this.getCode();
               }
+            })
+            .finally(() => {
+              this.loading = false;
             });
         }
       });
