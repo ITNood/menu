@@ -44,23 +44,29 @@
         indicator-position="none"
         @change="change"
         v-if="show">
+
         <el-carousel-item v-for="(item,index) in dataRows"
           :key="index">
           <div :style="{height: '600px',width:'90%'}"
             :ref="'viewer'+ index"></div>
+
           <!-- <process-viewer :xml="item.readXml"  /> -->
         </el-carousel-item>
+
       </el-carousel>
 
       <div class="news">
+
         <el-form :model="selectProcessForm"
           ref="newForm">
+
           <el-form-item label="名称："
             prop="idName">
             <el-input disabled
               v-model="selectProcessForm.processName"
               width="200px"></el-input>
           </el-form-item>
+
           <el-form-item label="版本号："
             prop="version">
             <el-select v-model="selectProcessForm.version"
@@ -70,8 +76,8 @@
                 :value="list.version"></el-option>
             </el-select>
           </el-form-item>
-        </el-form>
 
+        </el-form>
       </div>
       <span slot="footer"
         class="dialog-footer">
@@ -80,62 +86,95 @@
           @click="dialogVisible = false">确 定</el-button>
       </span>
     </el-dialog>
-
   </div>
 </template>
 
 <script>
-// import ProcessViewer from '../ProcessViewer';
-// import { listDefinition } from '@/api/workflow/definition';
-import { list } from '@/api/process/index';
+import { list as processList } from '@/api/process';
+import BpmnViewer from 'bpmn-js/lib/Viewer';
+import {
+  PrefabricationModuleDescriptor,
+  PrefabricationReaderModule,
+  PrefabricationTranslateModule,
+} from '@/components/bpmn/prefabrication';
 
 export default {
   name: 'Banner',
-  // components: {
-  //   ProcessViewer,
-  // },
-  props: {},
   data() {
     return {
       dialogVisible: false,
-
       queryParams: {
         name: '',
         deployTime: '',
+        pageNum: 1,
+        pageSize: 10,
+        type: 'select',
+        category: 0,
       },
-      lists: [],
-
-      number: 0,
-      show: false,
+      carouselIndex: 0,
       dataRows: [],
+      selectType: {},
+      allViewerCache: {},
       selectProcessForm: {
         processName: '',
         version: '',
       },
+      lists: [],
+      show: true,
+      number: 0,
     };
   },
-  created() {
-    this.getList();
-  },
-  mounted() {},
-
+  created() {},
   methods: {
-    open(type, id) {
+    open(group, type) {
       // 获取相关菜单ID的视图数据
-      // this.dataRows = []
-
+      this.dataRows = [];
+      this.selectType = type;
+      this.queryParams.category = type.id;
       this.dialogVisible = !this.dialogVisible;
+      this.getList();
+    },
+    getList() {
+      processList(this.queryParams).then((response) => {
+        this.dataRows = response.rows ?? [];
+        this.carouselIndex = 0;
+
+        if (this.dataRows.length) {
+          this.createViewer(
+            '#viewer' + this.carouselIndex,
+            this.dataRows[this.carouselIndex].readXml
+          );
+        }
+
+        // this.show = true;
+        // this.items = response.rows;
+        //
+        // //默认第一个
+        // this.newForm.idName = response.rows[0].processName;
+        // this.newForm.version = response.rows[0].version;
+        // this.lists = response.rows[0].vesrionsList.rows.map((item) => {
+        //   return {version: item.version};
+        // });
+      });
     },
     //选择版本号
     changeVersion(val) {
-      this.show = false;
-      const data = this.dataRows[this.number].vesrionsList.rows.filter(
-        (item) => {
-          if (item.version == val) {
-            return item;
-          }
+      let nowSelect = this.dataRows[this.carouselIndex];
+      const data = nowSelect.vesrionsList.rows.filter((item) => {
+        if (item.version == val) {
+          return item;
         }
-      );
+      });
+      Object.keys(data).forEach((key) => {
+        nowSelect[key] = data[key];
+      });
+
+      // this.show = false;
+      // const data = this.dataRows[this.number].vesrionsList.rows.filter((item) => {
+      //   if (item.version == val) {
+      //     return item;
+      //   }
+      // });
       this.$nextTick(() => {
         this.show = true;
         this.$set(this.dataRows[this.number], 'readXml', data[0].readXml);
@@ -143,31 +182,38 @@ export default {
     },
     //选择轮播图
     change(index) {
-      this.number = index;
-      this.selectProcessForm.processName = this.dataRows[index].processName;
-      this.selectProcessForm.version = this.dataRows[index].version;
-      this.lists = this.dataRows[index].vesrionsList.rows.map((item) => {
-        return { version: item.version };
+      this.carouselIndex = index;
+
+      // this.number = index;
+      // this.selectProcessForm.processName = this.dataRows[index].processName;
+      // this.selectProcessForm.version = this.dataRows[index].version;
+      // this.lists = this.dataRows[index].vesrionsList.rows.map((item) => {
+      //   return {version: item.version};
+      // });
+    },
+    async createViewer(container, xml) {
+      let that = this;
+      let idContainer = this.allViewerCache[container];
+      if (idContainer) {
+        idContainer.destroy();
+      }
+      let bpmn = new BpmnViewer({
+        container: that.$refs[idContainer],
+        keyboard: { bindTo: document },
+        additionalModules: [
+          PrefabricationTranslateModule,
+          PrefabricationReaderModule,
+          ...(this.selectType.bpmnConf?.additionalModules ?? []),
+        ],
+        moddleExtensions: {
+          ...PrefabricationModuleDescriptor,
+        },
+      });
+      this.allViewerCache[container] = bpmn;
+      await bpmn.importXML(xml).then(() => {
+        bpmn.get('canvas').zoom('fit-viewport', 'auto');
       });
     },
-    getList() {
-      const data = {
-        pageNum: 1,
-        pageSize: 10,
-        type: 'select',
-      };
-      list(data).then((response) => {
-        this.show = true;
-        this.items = response.rows;
-        //默认第一个
-        this.newForm.idName = response.rows[0].processName;
-        this.newForm.version = response.rows[0].version;
-        this.lists = response.rows[0].vesrionsList.rows.map((item) => {
-          return { version: item.version };
-        });
-      });
-    },
-    createViewer(container, xml) {},
     //搜索
     handleQuery() {
       this.getList();
@@ -180,6 +226,4 @@ export default {
   },
 };
 </script>
-
-<style scoped lang="scss">
-</style>
+<style lang="scss" scoped></style>

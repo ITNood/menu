@@ -106,13 +106,10 @@ export default {
           // }
           login(this.loginForm)
             .then((res) => {
-              sessionStorage.setItem('token', JSON.stringify(res.data.token));
-              console.log(res);
+              sessionStorage.setItem('token', 'Bearer ' + res.data.token);
               // location.href='/home'
-              // this.$router.push('/home');
-              this.$router
-                .push({ path: this.redirect || '/home' })
-                .catch(() => {});
+              this.$router.push('/home');
+              // this.$router.push({ path: this.redirect || "/home" }).catch(()=>{});
             })
             .catch(() => {
               if (this.captchaOnOff) {
