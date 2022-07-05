@@ -65,7 +65,7 @@ router.beforeEach((to, from, next) => {
   if (to.path == "/login") {
     next();
   } else {
-    const info = JSON.parse(sessionStorage.getItem('userInfo'))
+    const info = JSON.parse(sessionStorage.getItem('token'))
     //否则判断用户是否已经登录,注意这里是字符串判断
     if (info) {
       next();

@@ -25,7 +25,8 @@
                 v-model="loginForm.code"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="8"><img :src="codeUrl"  @click="getCode"/></el-col>
+          <el-col :span="8"><img :src="codeUrl"
+              @click="getCode" /></el-col>
         </el-row>
 
         <el-row>
@@ -44,9 +45,9 @@
 </template>
 
 <script>
-import Cookies from "js-cookie";
-import {encrypt,decrypt} from "@/utils/jsencrypt";
-import {getCodeImg,login} from "@/api/login";
+// import Cookies from 'js-cookie';
+import { encrypt, decrypt } from '@/utils/jsencrypt';
+import { getCodeImg, login } from '@/api/login';
 
 export default {
   data() {
@@ -56,10 +57,10 @@ export default {
         password: '111111',
         rememberMe: false,
         code: '',
-        uuid: ""
+        uuid: '',
       },
       src: '',
-      codeUrl: "",
+      codeUrl: '',
       loading: false,
     };
   },
@@ -70,47 +71,54 @@ export default {
   mounted() {},
   methods: {
     getCode() {
-      getCodeImg().then(res => {
-        this.captchaOnOff = res.data.captchaOnOff === undefined ? true : res.data.captchaOnOff;
+      getCodeImg().then((res) => {
+        this.captchaOnOff =
+          res.data.captchaOnOff === undefined ? true : res.data.captchaOnOff;
         if (this.captchaOnOff) {
-          this.codeUrl = "data:image/gif;base64," + res.data.img;
+          this.codeUrl = 'data:image/gif;base64,' + res.data.img;
           this.loginForm.uuid = res.data.uuid;
         }
       });
     },
     getCookie() {
-      const username = Cookies.get("username");
-      const password = Cookies.get("password");
-      const rememberMe = Cookies.get('rememberMe')
+      const username = Cookies.get('username');
+      const password = Cookies.get('password');
+      const rememberMe = Cookies.get('rememberMe');
       this.loginForm = {
         username: username === undefined ? this.loginForm.username : username,
-        password: password === undefined ? this.loginForm.password : decrypt(password),
-        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
+        password:
+          password === undefined ? this.loginForm.password : decrypt(password),
+        rememberMe: rememberMe === undefined ? false : Boolean(rememberMe),
       };
     },
     login() {
-      this.$refs.loginForm.validate(valid => {
+      this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.loading = true;
-          if (this.loginForm.rememberMe) {
-            Cookies.set("username", this.loginForm.username, { expires: 30 });
-            Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
-            Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
-          } else {
-            Cookies.remove("username");
-            Cookies.remove("password");
-            Cookies.remove('rememberMe');
-          }
-          // login(this.loginForm).then(() => {
-          //   console.log("PKL")
-            this.$router.push('/home')
-            // this.$router.push({ path: this.redirect || "/home" }).catch(()=>{});
-          // }).catch(() => {
-          //   this.loading = false;
-          //   if (this.captchaOnOff) {
-          //     this.getCode();
-          //   }
-          // });
+          // if (this.loginForm.rememberMe) {
+          //   Cookies.set("username", this.loginForm.username, { expires: 30 });
+          //   Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
+          //   Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
+          // } else {
+          //   Cookies.remove("username");
+          //   Cookies.remove("password");
+          //   Cookies.remove('rememberMe');
+          // }
+          login(this.loginForm)
+            .then((res) => {
+              // console.log('PKL');
+              // this.$router.push('/home');
+              sessionStorage.setItem('token', JSON.stringify(res.data.token));
+              this.$router
+                .push({ path: this.redirect || '/home' })
+                .catch(() => {});
+            })
+            .catch(() => {
+              this.loading = false;
+              if (this.captchaOnOff) {
+                this.getCode();
+              }
+            });
         }
       });
       // this.loading = true;
