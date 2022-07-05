@@ -7,7 +7,7 @@ class api {
   }
   async get(url, params) {
     //请求。页面中.then执行成功时的操作。
-    return await http.get(url, { params })
+    return await http.get(url, params)
   }
   async put(url, params) {
     //请求。页面中.then执行成功时的操作。

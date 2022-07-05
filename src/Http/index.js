@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { Loading, Message } from 'element-ui'
-// import json_response_codes from './codes'
 import Vue from 'vue'
 import Router from 'vue-router'
 Vue.use(Router)
@@ -35,16 +34,15 @@ Axios.interceptors.request.use(
 )
 // 拦截所有的 api 响应，可以实现自动弹窗报错
 Axios.interceptors.response.use(
-  response => {   // when HTTP_STATUS in [ 200 , 299 ]c
-    console.log('response', response)
+  response => {   // when HTTP_STATUS in [ 200 , 299 ]
     // load.close()
     //判断登录状态，跳转路由
     if (response.data.code == 500) {//退出登录
-      this.$message.info(response.data.msg)
+      Message.info(response.data.msg)
       sessionStorage.removeItem('token')
-      this.$router.push('/')
+      location.hash = '/login'
     } else if (response.data.code == 400) {//返回错误
-      this.$message.danger(response.data.msg)
+      Message.error(response.data.msg)
       return Promise.resolve(response.data)
     } else if (response.data.code == 200) {//code===200返回数据
       return Promise.resolve(response.data);
