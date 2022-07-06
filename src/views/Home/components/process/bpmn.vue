@@ -1,7 +1,7 @@
 <template>
   <div>
     <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn" :bpmn="bpmnProp.bpmn"
-                    :min-zoom="0.1" :max-zoom="4"/>
+                    :min-zoom="0.1" :max-zoom="4" @newXml="importXML"/>
     <div class="containers" ref="containers">
       <div class="canvas" ref="canvas" id="canvas"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
@@ -141,16 +141,11 @@ export default {
      */
     async importXML(bpmn, xml) {
       if (xml) {
-        bpmn.importXML(xml);
+        await bpmn.importXML(xml);
       } else {
         if (bpmn.createDiagram) {
           await bpmn.createDiagram().then(() => {
-            bpmn
-                .get('elementRegistry')
-                .updateId(
-                    bpmn.get('canvas').getRootElements()[0],
-                    'Process_' + Date.now().valueOf()
-                );
+            bpmn.get('elementRegistry').updateId(bpmn.get('canvas').getRootElements()[0], 'Process_' + Date.now().valueOf());
           });
         }
       }
@@ -462,6 +457,9 @@ export default {
   top: 0;
   right: 0;
   display: block;
+}
+.djs-palette{
+  width: 96px;
 }
 
 .properties-panel-parent {

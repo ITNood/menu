@@ -1,4 +1,4 @@
-<template>
+<template xmlns:el-col="http://www.w3.org/1999/html">
   <div>
     <el-dialog title="选择流程" :visible.sync="dialogVisible" width="90%" :close-on-click-modal="false"
                :close-on-press-escape="false" :show-close="false" append-to-body>        <!-- 面包屑 / 当前所在位置导航 -->
@@ -16,8 +16,22 @@
             <el-col :span="4" v-for="(element, index) in selectTypes.childNode" :key="index"
                     :offset="index%4 > 0 ? 2 : 1">
               <el-card :shadow="(element.status && element.status === 'Active')?'hover':'never'">
-                <div v-on:click="choiceTypeClick(element)">
-                  <div style="padding: 14px;text-align: center; "><span>{{ element.moduleName }}</span></div>
+                <div style="padding: 14px;text-align: center;">
+                  <el-col v-if="element.preview" :span="10">
+                    <el-image :src="element.preview" fit="cover" style="max-width: 100px"/>
+                  </el-col>
+                  <el-col :span="element.preview?14:24">
+                    <el-row>
+                      <span>{{ element.moduleName }}</span></el-row>
+                    <el-row>
+                      <el-col :span="12" v-if="element.childNode.length">
+                        <el-button v-on:click="choiceTypeClick(element)" size="mini">展开</el-button>
+                      </el-col>
+                      <el-col :span="element.childNode.length?12:24">
+                        <el-button size="mini">选定</el-button>
+                      </el-col>
+                    </el-row>
+                  </el-col>
                 </div>
               </el-card>
             </el-col>
@@ -40,7 +54,7 @@
         <el-button type="primary" @click="dialogVisible = false">{{ $t('el.messagebox.confirm') }}</el-button>
       </span>
     </el-dialog>
-    <banner ref="selectProcessBanner" v-if="selectTypes"/>
+    <banner ref="selectProcessBanner" @onSelect="onSelect"/>
   </div>
 </template>
 
@@ -65,21 +79,20 @@ export default {
     };
   },
   created() {
-    // TODO 需要访问后端地址获取详细信息
-    //
-    // this.types = HTTPResponse();
     const that = this;
 
-    list()
-        .then((response) => {
-          that.types = response.data;
-          console.log(response.data);
-        })
-        .then(() => that.choiceTypeClick(that.types[0]));
+    list().then((response) => {
+      that.types = response.data;
+    }).then(() => that.choiceTypeClick(that.types[0]));
   },
   methods: {
     open() {
       this.dialogVisible = !this.dialogVisible;
+    },
+    onSelect(xml) {
+      this.convertType2BpmnConfig();
+      this.dialogVisible = false;
+      this.$emit('onSelect', this.selectTypes, xml);
     },
 
     choiceTypeClick(element) {
@@ -109,8 +122,7 @@ export default {
       this.choiceTypeClick(selectTypes);
     },
     convertType2BpmnConfig() {
-      if (this.selectTypes.bpmnConf) {
-
+      if (!this.selectTypes.bpmnConf) {
         let config = {
           additionalModules: [],
         };
@@ -139,11 +151,6 @@ export default {
       }
     },
 
-    onSelect(xml) {
-      this.convertType2BpmnConfig();
-      this.dialogVisible = false;
-      this.$emit('onSelect', this.selectTypes, xml);
-    },
     selectTemplate() {
       this.convertType2BpmnConfig();
       this.$refs['selectProcessBanner'].open('template', this.selectTypes);
