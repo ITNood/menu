@@ -177,10 +177,10 @@ export default {
     player() {
       this.play = !this.play;
       this.isshow = false;
-      console.log(this.play);
     },
     //重置
     reset() {
+      this.play = true;
       this.isshow = true;
     },
     //下一个

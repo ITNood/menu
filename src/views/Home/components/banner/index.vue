@@ -44,12 +44,10 @@
         indicator-position="none"
         @change="change"
         v-if="show">
-
         <el-carousel-item v-for="(item,index) in dataRows"
           :key="index">
           <div :style="{height: '600px',width:'90%'}"
             :ref="'viewer'+ index"></div>
-
           <!-- <process-viewer :xml="item.readXml"  /> -->
         </el-carousel-item>
 
@@ -136,14 +134,16 @@ export default {
     },
     getList() {
       processList(this.queryParams).then((response) => {
-        this.dataRows = response.rows ?? [];
-        this.carouselIndex = 0;
+        if (response) {
+          this.dataRows = response.rows ?? [];
+          this.carouselIndex = 0;
 
-        if (this.dataRows.length) {
-          this.createViewer(
-            '#viewer' + this.carouselIndex,
-            this.dataRows[this.carouselIndex].readXml
-          );
+          if (this.dataRows.length) {
+            this.createViewer(
+              '#viewer' + this.carouselIndex,
+              this.dataRows[this.carouselIndex].readXml
+            );
+          }
         }
 
         // this.show = true;
