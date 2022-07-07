@@ -5,6 +5,16 @@
   font-size : 16px;
 }
 
+@withe      :white;
+@theme      :#012A4A;
+@titleBgk   :#F2F2F2;
+@font333    :#333333;
+@bordercolor: #F2F2F2;
+@red        :#D9001B;
+@orange     :#F59A23;
+@green      :#03BF16;
+@blue       :#409eff;
+
 /*定义滚动条高宽及背景
  高宽分别对应横竖滚动条的尺寸*/
 ::-webkit-scrollbar {
@@ -358,11 +368,45 @@ a {
   }
 
   p {
-    width: 60%;
+    width      : 60%;
     line-height: 12px;
-    font-size: 12px;
-    word-wrap:break-word;
-    word-break: break-all;
-    margin: auto 0px;
+    font-size  : 12px;
+    word-wrap  : break-word;
+    word-break : break-all;
+    margin     : auto 0px;
+  }
+}
+
+
+.tagtitle {
+  background-color: @titleBgk;
+  padding         : 15px;
+  overflow        : auto;
+  width           : calc(100% - 30px);
+  overflow-x      : auto;
+
+  .tabs {
+    .el-tag {
+      margin          : 0 5px;
+      cursor          : pointer;
+      color           : @font333;
+      border-color    : @bordercolor;
+      background-color: @withe;
+      display         : block;
+      float           : left;
+
+      .el-tag__close {
+        color: @font333;
+      }
+    }
+
+    .current {
+      background-color: @blue;
+      color           : @withe;
+
+      i {
+        color: @withe  !important;
+      }
+    }
   }
 }

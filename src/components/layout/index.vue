@@ -18,6 +18,19 @@
               <el-dropdown-item command="b">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
+
+          <div class="tagtitle">
+            <div class="tabs clear">
+              <el-tag v-for="tag in getrouterList"
+                :key="tag.path"
+                :closable="tag.clearclose"
+                @close="handleCloseTag(tag)"
+                @click="tabs(tag.path)"
+                :class="tag.current == true ? 'current' : ''">
+                {{ tag.title }}
+              </el-tag>
+            </div>
+          </div>
         </el-header>
         <el-main>
           <router-view />
@@ -31,6 +44,7 @@
 <script>
 import Menu from './menu.vue';
 import router from '../../router';
+import { mapActions, mapGetters } from 'vuex';
 export default {
   components: { Menu },
   data() {
@@ -38,13 +52,83 @@ export default {
       route: [],
       collapse: false,
       avatar: require('../../assets/logo.png'),
+      tags: [],
     };
   },
+  watch: {
+    $route(newValue, oldValue) {
+      console.log('newValue', newValue);
+      this.setTags(newValue);
+    },
+  },
+  computed: {
+    ...mapGetters(['getrouterList']),
+  },
+
   created() {
     this.route = router.options.routes[0].children;
   },
-  mounted() {},
+  mounted() {
+    this.setTags(this.$route);
+  },
   methods: {
+    ...mapActions(['addRouter', 'deleteRouter']),
+    tabs(path) {
+      this.$router.push(path);
+      //tag标签对应当前路由背景色
+      this.getrouterList.map((item) => {
+        if (item.path === path) {
+          item.current = true;
+        } else {
+          item.current = false;
+        }
+      });
+      console.log('current', this.getrouterList);
+    },
+    handleCloseTag(tag) {
+      //关闭标签
+      if (this.getrouterList.length > 0) {
+        const index = this.getrouterList.findIndex(
+          (item) => item.title === tag.title
+        );
+        if (index === -1) {
+          this.$router.push({ title: '首页' });
+        } else if (this.$route.path === tag.path) {
+          console.log('this.$route.path', this.$route.path);
+          if (index === this.getrouterList.length - 1) {
+            // 最后一个 往前一个挪
+            this.$router.push(this.getrouterList[index - 1].path);
+          } else {
+            // 往后面挪
+            this.$router.push(this.getrouterList[index + 1].path);
+          }
+        }
+      } else {
+        this.$router.push({ title: '首页' });
+      }
+      this.deleteRouter(tag.title);
+    },
+    setTags(route) {
+      const isExsit = this.tags.some((item) => {
+        return item.path === route.fullPath;
+      });
+      if (isExsit == false) {
+        this.addRouter({
+          title: route.meta.title, //标签名
+          path: route.fullPath, //路由
+          current: false,
+          clearclose: !(route.meta.title == '首页'),
+        });
+      }
+      //tag标签对应当前路由背景色
+      this.getrouterList.map((item) => {
+        if (item.path === route.fullPath) {
+          item.current = true;
+        } else {
+          item.current = false;
+        }
+      });
+    },
     handleCommand(command) {
       console.log(command);
       if (command == 'b') {
