@@ -19,6 +19,7 @@
       <h2>当前货箱信息</h2>
       <ul class="trayList">
         <li><span>货箱序号</span>{{box}}</li>
+        <li><span>箱子编号</span>{{caseNumber}}</li>
         <li><span>箱深</span>{{length}}</li>
         <li><span>箱宽</span>{{width}}</li>
         <li><span>箱高</span>{{height}}</li>
@@ -93,6 +94,7 @@ export default {
     'total',
     'play',
     'arrayData',
+    'caseNumber',
   ],
   data() {
     return {

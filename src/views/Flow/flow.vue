@@ -20,6 +20,7 @@
       :total="total"
       :play="play"
       :arrayData="array"
+      :caseNumber="caseNumber"
       @prev="prev"
       @player="player"
       @reset="reset"
@@ -74,9 +75,10 @@ export default {
       length: '',
       width: '',
       height: '',
+      caseNumber: '',
       lengthNumber: '',
       total: '',
-      show: false,
+      show: true,
       isshow: true,
       play: true,
       numberkpi: '',
