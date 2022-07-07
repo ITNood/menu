@@ -101,12 +101,12 @@
               </el-select>
             </el-form-item>
             <el-form-item label="引用流程：" prop="ID">
-              <el-input :value="businessObject.get('ref')?businessObject.get('ref'):'暂无'" disabled
-                        size="mini"></el-input>
+              <el-input :value="businessObject.get('refId')" disabled size="mini"></el-input>
             </el-form-item>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-button icon="el-icon-refresh-right" type="success" round size="mini" @click="toggleFlow">切换流程
+                <el-button :icon="businessObject.get('refId')?'el-icon-refresh-right':'el-icon-plus'" type="success" round size="mini" @click="toggleFlow">
+                  {{businessObject.get('refId')?'切换流程':'选择流程'}}
                 </el-button>
               </el-col>
               <el-col :span="12">
@@ -249,7 +249,7 @@ export default {
     },
     //切换
     toggleFlow() {
-      this.$emit('toggleFlow');
+      this.$emit('toggleFlow',this.selectIndex);
     },
   },
 };

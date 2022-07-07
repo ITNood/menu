@@ -43,9 +43,9 @@ Axios.interceptors.response.use(
             Message.error(response.data.msg)
             return Promise.resolve(response.data)
         } else if (response.data.code == 401) {//认证失败
-            Message.info(response.data.msg)
             sessionStorage.removeItem('token')
             location.href = "/login"
+            Message.info(response.data.msg)
         } else if (response.data.code == 400) {//返回错误
             Message.error(response.data.msg)
             return Promise.resolve(response.data)

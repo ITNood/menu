@@ -5,6 +5,7 @@ exports.default = {
 
     bpmn: {
         Process:"流程图",
+        "RefServiceTask": "引用流程",
         // 添加部分
         "Append EndEvent": "追加结束事件",
         "Append Gateway": "追加网关",

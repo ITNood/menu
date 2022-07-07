@@ -5,10 +5,11 @@
     <div class="containers" ref="containers">
       <div class="canvas" ref="canvas" id="canvas"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
-      <right-menu @toggleFlow="out" :panel-types="selectType" :elements="selectElements" :bpmn="bpmnProp.bpmn"
+      <right-menu @toggleFlow="reSelectChildren" :panel-types="selectType" :elements="selectElements"
+                  :bpmn="bpmnProp.bpmn"
                   @changeField="changeField"/>
     </div>
-    <select-type-panel ref="typeSelect" @onSelect="typeSelect"/>
+    <select-type-panel ref="typeSelect" @onSelect="typeSelect" :default-visible="selectTypePanelDefaultVisible"/>
   </div>
 </template>
 <script>
@@ -67,10 +68,13 @@ export default {
         },
       },
 
+      selectTypePanelDefaultVisible: true,
       selectType: {},
       selectElements: [],
       // 系统处理标识，在初始化后更新
       initialized: false,
+      protect: false,
+      rightMenuSelectIndex: null,
       bpmnProp: {
         container: 'canvas',
         keyboardDefaultBindTo: window,
@@ -93,10 +97,30 @@ export default {
     this.$refs['typeSelect'].open();
   },
   methods: {
-    typeSelect(selectType, xml) {
-      this.selectType = selectType;
+    typeSelect(selectType, xml, id) {
+      if (this.protect) {
+        console.log(selectType, id)
+        // 开启新的页面
+        if (xml) {
+          this.bpmnProp.modules.modeling.updateProperties(this.selectElements[this.rightMenuSelectIndex], {
+            ref: selectType.id,
+            refId: id
+          });
+        } else {
+          // 开启新页面 TODO
 
-      this.init(xml, selectType.bpmnConf);
+          // 处理新页面内容
+          this.newTabInit(selectType, xml, id)
+        }
+      } else {
+        this.selectType = selectType;
+        this.init(xml, selectType.bpmnConf);
+      }
+    },
+    newTabInit(selectType, xml, id) {
+      // 新页面的对象初始化方法
+      this.selectTypePanelDefaultVisible = false;
+      this.typeSelect(selectType, xml, id);
     },
 
     /**
@@ -114,12 +138,12 @@ export default {
 
       props.bpmn = new BpmnModeler({
         container: that.$refs[props.container],
-        keyboard: props.keyboard ?? {bindTo: props.keyboardDefaultBindTo},
+        // keyboard: props.keyboard ?? {bindTo: props.keyboardDefaultBindTo},
         additionalModules: [
           PrefabricationTranslateModule,
           PrefabricationPaletteModule,
           PrefabricationReaderModule,
-          ...(conf?.additionalModules ?? []),
+          ...(conf?.additionalModules ?? [{prefabricationPaletteExtendParam: ['value', {}]}]),
         ],
         moddleExtensions: {
           ...PrefabricationModuleDescriptor,
@@ -163,15 +187,13 @@ export default {
         props.zoom = Math.floor(scale * 100) / 100;
       });
 
-      // props.modules.eventBus.on("element.updateProperties", (element) => {
-      //   // 数据更新后
-      //   console.log(element)
-      //   // this.selectElements = this.selectElements;
-      //
-      //   // let newValue = this.selectElements;
-      //   // this.selectElements = [];
-      //   // this.selectElements = newValue;
-      // });
+      props.modules.eventBus.on("element.updateProperties", (element) => {
+        // 数据更新后
+        console.log("updateProperties")
+        let newValue = this.selectElements;
+        this.selectElements = [];
+        this.selectElements = newValue;
+      });
 
       props.modules.eventBus.on('selection.changed', (event) => {
         this.selectElements = event.newSelection.length
@@ -313,10 +335,7 @@ export default {
       if (first && second) {
         let firstName = first.businessObject.name;
         let secondName = second.businessObject.name;
-        if (
-            (firstName ? (firstName == 'true' ? 'false' : 'true') : null) !=
-            secondName
-        ) {
+        if ((firstName ? (firstName == 'true' ? 'false' : 'true') : null) != secondName) {
           if (firstName) {
             this.bpmnProp.modules.modeling.updateProperties(second, {
               name: firstName == 'true' ? 'false' : 'true',
@@ -434,7 +453,12 @@ export default {
       }
     },
 
-    out() {
+    reSelectChildren(index) {
+      this.rightMenuSelectIndex = index
+      this.protect = true;
+      let typeSelectPanel = this.$refs['typeSelect']
+      typeSelectPanel.open();
+      typeSelectPanel.changeCoreTypesAndChoice([this.selectType]);
     },
   },
 };
@@ -458,7 +482,8 @@ export default {
   right: 0;
   display: block;
 }
-.djs-palette{
+
+.djs-palette {
   width: 96px;
 }
 
