@@ -43,15 +43,37 @@ Axios.interceptors.response.use(
       Message.error(response.data.msg)
       return Promise.resolve(response.data)
     } else if (response.data.code == 401) {//认证失败
-      Message.info(response.data.msg)
       sessionStorage.removeItem('token')
-      location.hash = "/login"
+      location.href = "/login"
+      Message.info(response.data.msg)
     } else if (response.data.code == 400) {//返回错误
       Message.error(response.data.msg)
       return Promise.resolve(response.data)
     } else if (response.data.code == 200) {//code===200返回数据
       return Promise.resolve(response.data);
     }
+  },
+  error => {      // when HTTP_STATUS in [ 300 , 599 ]
+    // load.close()
+    if (error === 'cancelled locally') {
+      return Promise.reject(error);
+    }
+    if (error.message === 'timeout of 5000ms exceeded') {
+      Message({
+        message: '接口请求超时!', type: 'error', duration: 3 * 1000
+      });
+      return Promise.reject(error);
+    }
+    if (error.response.code === 429) {
+      Message({
+        message: '您的请求频率太快啦!', type: 'info', duration: 3 * 1000
+      });
+      return Promise.reject(error);
+    }
+    Message({
+      message: '接口或网络异常，请稍后再试!', type: 'error', duration: 3 * 1000
+    });
+    return Promise.reject(error);
   },
   error => {      // when HTTP_STATUS in [ 300 , 599 ]
     // load.close()

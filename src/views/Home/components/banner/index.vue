@@ -3,10 +3,13 @@
     <el-dialog title="提示"
       :visible.sync="dialogVisible"
       width="60%"
-      id="stepChild">
+      id="stepChild"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false">
       <!--查询-->
       <el-form :model="queryParams"
-        ref="queryParams"
+        ref="queryForm"
         :inline="true"
         label-width="68px">
         <el-form-item label="名称"
@@ -17,13 +20,9 @@
             size="small"
             @keyup.enter.native="handleQuery" />
         </el-form-item>
-        <el-form-item prop="startTime"
-          label="开始时间">
-          <el-date-picker v-model="queryParams.startTime"
-            size="small"
-            type="date"
-            clearable
-            placeholder="选择时间"></el-date-picker>
+        <el-form-item label="开始时间"
+          prop="deployTime">
+          <!--          <el-date-picker clearable size="small" v-model="queryParams.deployTime" type="date"-->
         </el-form-item>
 
         <el-form-item>
@@ -44,8 +43,8 @@
         @change="change">
         <el-carousel-item v-for="(item,index) in dataRows"
           :key="index">
-          <div :ref="'viewer'+ index"
-            :style="{height: '600px',width:'90%',background:'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+'}" />
+          <div class="bpmnDiv"
+            :ref="'viewer'+ index"></div>
         </el-carousel-item>
       </el-carousel>
 
@@ -75,7 +74,7 @@
       </div>
       <span slot="footer"
         class="dialog-footer">
-        <el-button @click="dialogVisible = false,$destroy">取 消</el-button>
+        <el-button @click="cancel">取 消</el-button>
         <el-button type="primary"
           @click="selection">确 定</el-button>
       </span>
@@ -90,6 +89,17 @@ import {
   PrefabricationReaderModule,
   PrefabricationTranslateModule,
 } from '@/components/bpmn/prefabrication';
+
+// 通过鼠标移动画布
+import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
+// 编辑器事件，在使用键盘组件时需要添加
+import EditorActionsModule from 'bpmn-js/lib/features/editor-actions';
+// 键盘监听扩展
+import KeyboardModule from 'bpmn-js/lib/features/keyboard';
+// 通过键盘移动画布的功能
+import KeyboardMoveModule from 'diagram-js/lib/navigation/keyboard-move/index.js';
+// Ctrl + F 搜索框
+import SearchModule from 'bpmn-js/lib/features/search';
 
 export default {
   name: 'Banner',
@@ -114,39 +124,41 @@ export default {
   methods: {
     open(group, type) {
       // 获取相关菜单ID的视图数据
-      this.dataRows = [];
       this.selectType = type;
-      this.queryParams.category = type.id;
-      this.dialogVisible = !this.dialogVisible;
+      this.queryParams = {
+        deployTime: '',
+        name: '',
+        pageNum: 1,
+        pageSize: 10,
+        type: 'select',
+        category: group + type.id,
+      };
+      this.dialogVisible = true;
       this.getList();
     },
     selection() {
-      this.dialogVisible = false;
-      this.$emit('onSelect', this.dataRows[this.carouselIndex].readXml);
-      this.$nextTick(() => {
-        this.$destroy();
-      });
+      let that = this;
+      that.dialogVisible = false;
+      if (that.dataRows[that.carouselIndex]) {
+        that.$emit(
+          'onSelect',
+          that.dataRows[that.carouselIndex].readXml,
+          that.dataRows[that.carouselIndex].definitionId
+        );
+      }
+    },
+    cancel() {
+      let that = this;
+      that.dialogVisible = false;
     },
     getList() {
+      this.dataRows = [];
       processList(this.queryParams).then((response) => {
-        if (response) {
-          this.dataRows = response.rows ?? [];
-          this.carouselIndex = 0;
-
-          if (this.dataRows.length) {
-            this.reloadViewer();
-          }
+        this.carouselIndex = 0;
+        this.dataRows = response.rows ?? [];
+        if (this.dataRows.length) {
+          this.reloadViewer();
         }
-        // this.show = true;
-
-        // this.items = response.rows;
-        //
-        // //默认第一个
-        // this.newForm.idName = response.rows[0].processName;
-        // this.newForm.version = response.rows[0].version;
-        // this.lists = response.rows[0].vesrionsList.rows.map((item) => {
-        //   return {version: item.version};
-        // });
       });
     },
     //选择版本号
@@ -162,7 +174,9 @@ export default {
           nowSelect[i] = data[i];
         }
       });
-      this.reloadViewer();
+      if (data.readXml) {
+        this.reloadViewer();
+      }
     },
     //选择轮播图
     change(index) {
@@ -183,23 +197,34 @@ export default {
       if (idContainer) {
         idContainer.destroy();
       }
-      let ref = that.$refs[container][0];
-      let bpmn = new BpmnViewer({
-        container: ref,
-        keyboard: { bindTo: ref },
-        additionalModules: [
-          PrefabricationTranslateModule,
-          PrefabricationReaderModule,
-          ...(this.selectType.bpmnConf?.additionalModules ?? []),
-        ],
-        moddleExtensions: {
-          ...PrefabricationModuleDescriptor,
-        },
-      });
-      this.allViewerCache[container] = bpmn;
-      bpmn.importXML(xml).then(() => {
-        bpmn.get('canvas').zoom('fit-viewport', 'auto');
-      });
+      if (xml) {
+        let ref = that.$refs[container][0];
+        let bpmn = new BpmnViewer({
+          container: ref,
+          keyboard: { bindTo: document },
+          additionalModules: [
+            MoveCanvasModule,
+            KeyboardMoveModule,
+            EditorActionsModule,
+            SearchModule,
+            KeyboardModule,
+            PrefabricationTranslateModule,
+            PrefabricationReaderModule,
+            ...(this.selectType.bpmnConf?.additionalModules ?? [
+              { prefabricationPaletteExtendParam: ['value', {}] },
+            ]),
+          ],
+          moddleExtensions: {
+            ...PrefabricationModuleDescriptor,
+          },
+        });
+
+        console.log(bpmn.injector._instances, bpmn.get('editorActions'));
+        this.allViewerCache[container] = bpmn;
+        bpmn.importXML(xml).then(() => {
+          bpmn.get('canvas').zoom('fit-viewport', 'auto');
+        });
+      }
     },
     //搜索
     handleQuery() {
@@ -214,4 +239,10 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped></style>
+<style lang="css" scoped>
+.bpmnDiv {
+  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+');
+  height: 600px;
+  width: 90%;
+}
+</style>

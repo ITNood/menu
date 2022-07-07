@@ -17,45 +17,59 @@
       <el-divider></el-divider>
       <el-row>
         <el-col :span="20">
-          <!-- <el-cascader placeholder="试试搜索：指南"             :options="options"             filterable></el-cascader> -->
           <el-row v-if="selectTypes && selectTypes.status && selectTypes.status === 'Active'">
             <el-col :span="4"
               v-for="(element, index) in selectTypes.childNode"
               :key="index"
               :offset="index%4 > 0 ? 2 : 1">
-              <el-card :shadow="(element.status && element.status === 'Active')?'hover':'never'">
-                <div style="padding: 14px;text-align: center;">
+              <el-card :shadow="(planType.id === element.id)?'always':'hover'"
+                style="margin-bottom: 20px"
+                :style="(planType.id === element.id)?{border:'1px solid #0ff'}:{}">
+                <el-row :gutter="20"
+                  type="flex"
+                  justify="space-around">
                   <el-col v-if="element.preview"
                     :span="10">
                     <el-image :src="element.preview"
                       fit="cover"
                       style="max-width: 100px" />
                   </el-col>
+                  <!--                  <el-col :span="1"></el-col>-->
                   <el-col :span="element.preview?14:24">
-                    <el-row>
+                    <el-row style="text-align: center;margin-bottom: 10px;">
                       <span>{{ element.moduleName }}</span>
                     </el-row>
-                    <el-row>
+                    <el-row style="text-align: center">
                       <el-col :span="12"
                         v-if="element.childNode.length">
                         <el-button v-on:click="choiceTypeClick(element)"
                           size="mini">展开</el-button>
                       </el-col>
                       <el-col :span="element.childNode.length?12:24">
-                        <el-button size="mini">选定</el-button>
+                        <el-button size="mini"
+                          v-on:click="plannedTypeClick(element)">
+                          {{ (planType.id === element.id) ? '已选定' : '选定' }}
+                        </el-button>
                       </el-col>
                     </el-row>
                   </el-col>
-                </div>
+                </el-row>
               </el-card>
             </el-col>
           </el-row>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="4"
+          v-if="Object.keys(planType).length">
+          <el-col>
+            <el-form>
+              <el-form-item label="已选中：">{{ planType.moduleName ? (planType.moduleName) : '' }}</el-form-item>
+              <el-form-item label="描述内容：">{{ planType.description ? (planType.description) : '' }}</el-form-item>
+            </el-form>
+          </el-col>
           <el-col>
             <el-button type="text"
               icon="el-icon-plus"
-              @click="onSelect(null)">创建一个新的流程</el-button>
+              @click="onSelect(null,null)">创建一个新的流程</el-button>
           </el-col>
           <el-col>
             <el-button type="text"
@@ -69,12 +83,10 @@
           </el-col>
         </el-col>
       </el-row>
-      <span slot="footer"
-        class="dialog-footer">
-        <el-button @click="dialogVisible = false">{{ $t('el.messagebox.cancel') }}</el-button>
-        <el-button type="primary"
-          @click="dialogVisible = false">{{ $t('el.messagebox.confirm') }}</el-button>
-      </span>
+      <!--      <span slot="footer" class="dialog-footer">-->
+      <!--        <el-button @click="dialogVisible = false">{{ $t('el.messagebox.cancel') }}</el-button>-->
+      <!--        <el-button type="primary" @click="dialogVisible = false">{{ $t('el.messagebox.confirm') }}</el-button>-->
+      <!--      </span>-->
     </el-dialog>
     <banner ref="selectProcessBanner"
       @onSelect="onSelect" />
@@ -90,35 +102,54 @@ import Banner from '../../banner/index.vue';
 export default {
   name: 'SelectTypePanel',
   components: { Banner },
+  props: {
+    defaultVisible: Boolean,
+  },
+  watch: {
+    defaultVisible(newVal) {
+      this.dialogVisible = newVal;
+    },
+  },
   data() {
     return {
-      dialogVisible: false,
-      bannerVisible: false,
+      dialogVisible: this.defaultVisible,
       types: [],
       selectTypes: {},
+      planType: {},
       breadcrumb: [],
-      options: [],
-      value: '',
     };
   },
   created() {
     const that = this;
-    list()
-      .then((response) => {
-        that.types = response.data;
-      })
-      .then(() => that.choiceTypeClick(that.types[0]));
+    list().then((response) => {
+      that.changeCoreTypesAndChoice(response.data);
+    });
   },
   methods: {
     open() {
-      this.dialogVisible = !this.dialogVisible;
+      this.dialogVisible = true;
     },
-    onSelect(xml) {
-      this.convertType2BpmnConfig();
-      this.dialogVisible = false;
-      this.$emit('onSelect', this.selectTypes, xml);
+    onSelect(xml, id) {
+      if (this.planType) {
+        this.convertType2BpmnConfig();
+        this.dialogVisible = false;
+        this.$emit('onSelect', this.planType, xml, id);
+      } else {
+        this.$message.info('请选择一个流程类型');
+      }
     },
+    plannedTypeClick(element) {
+      this.planType = element || {};
+    },
+    changeCoreTypesAndChoice(newCoreTypes) {
+      this.types = [];
+      this.selectTypes = {};
+      this.planType = {};
+      this.breadcrumb = [];
 
+      this.types = newCoreTypes;
+      this.choiceTypeClick(this.types[0]);
+    },
     choiceTypeClick(element) {
       if (element.status && element.status === 'Active') {
         this.breadcrumb.push(element.moduleName);
@@ -146,45 +177,44 @@ export default {
       this.choiceTypeClick(selectTypes);
     },
     convertType2BpmnConfig() {
-      if (!this.selectTypes.bpmnConf) {
+      if (!this.planType.bpmnConf) {
         let config = {
           additionalModules: [],
         };
-        let prefabricationPaletteExtendParam = {
-          'ref:separator:top': 'ref',
-        };
-        if (this.selectTypes.childNode) {
-          this.selectTypes.childNode.forEach((item) => {
+        let prefabricationPaletteExtendParam = {};
+        if (this.planType.childNode.length) {
+          prefabricationPaletteExtendParam['ref:separator:top'] = 'ref';
+          this.planType.childNode.forEach((item) => {
             prefabricationPaletteExtendParam[
               'create.ref-service_task' + item.id
             ] = {
               type: 'refBpmn:RefServiceTask',
               group: 'ref' + item.id,
               title: item.moduleName,
-              className: 'ttttt0',
+              className: 'customer-element',
               icoImageUrl: item.icon,
               shapeImageUrl: item.preview,
               index: item.id,
             };
           });
         }
-
         config.additionalModules.push({
           prefabricationPaletteExtendParam: [
             'value',
             Object.assign(prefabricationPaletteExtendParam),
           ],
         });
-        this.selectTypes.bpmnConf = config;
+        this.planType.bpmnConf = config;
       }
     },
 
     selectTemplate() {
       this.convertType2BpmnConfig();
-      this.$refs['selectProcessBanner'].open('template', this.selectTypes);
+      this.$refs['selectProcessBanner'].open('template', this.planType);
     },
     selectHistory() {
-      this.$refs['selectProcessBanner'].open('history', this.selectTypes);
+      this.convertType2BpmnConfig();
+      this.$refs['selectProcessBanner'].open('', this.planType);
     },
   },
 };
