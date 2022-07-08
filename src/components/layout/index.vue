@@ -120,9 +120,8 @@ export default {
       });
     },
     handleCommand(command) {
-      console.log(command);
       if (command == 'b') {
-        sessionStorage.removeItem('userInfo');
+        sessionStorage.removeItem('token');
         this.$router.push('/login');
       }
     },
