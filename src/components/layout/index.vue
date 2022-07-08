@@ -57,7 +57,6 @@ export default {
   },
   watch: {
     $route(newValue, oldValue) {
-      console.log('newValue', newValue);
       this.setTags(newValue);
     },
   },
@@ -75,15 +74,6 @@ export default {
     ...mapActions(['addRouter', 'deleteRouter']),
     tabs(path) {
       this.$router.push(path);
-      //tag标签对应当前路由背景色
-      this.getrouterList.map((item) => {
-        if (item.path === path) {
-          item.current = true;
-        } else {
-          item.current = false;
-        }
-      });
-      console.log('current', this.getrouterList);
     },
     handleCloseTag(tag) {
       //关闭标签

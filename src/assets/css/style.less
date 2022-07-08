@@ -95,7 +95,7 @@ a {
 }
 
 .el-main {
-  height  : calc(100vh - 120px);
+  height  : calc(100vh - 182px);
   padding : 20px;
   position: relative;
 }
@@ -104,16 +104,22 @@ a {
   background-color: white;
   border-bottom   : 1px solid #e6e6e6;
   box-shadow      : 0 5px 5px #e6e6e6;
-  display         : flex;
-  align-items     : center;
-  justify-content : flex-end;
   position        : relative;
+  height          : 122px !important;
 }
 
 .el-dropdown-link {
   display    : flex;
   align-items: center;
   cursor     : pointer;
+}
+
+.el-dropdown {
+  width          : 100%;
+  display        : flex;
+  align-items    : center;
+  justify-content: flex-end;
+  padding        : 10px 0;
 }
 
 .el-footer {
@@ -314,7 +320,7 @@ a {
 
 .flex {
   display: flex;
-  height : calc(100vh - 160px);
+  height : calc(100vh - 222px);
 }
 
 .show {
@@ -380,7 +386,7 @@ a {
 
 .tagtitle {
   background-color: @titleBgk;
-  padding         : 15px;
+  padding         : 5px;
   overflow        : auto;
   width           : calc(100% - 30px);
   overflow-x      : auto;
