@@ -15,7 +15,6 @@ export default new Vuex.Store({
   },
   mutations: {
     ADD_ROUTER(state, data) {
-      console.log('/////////////', data)
       const index = state.routerList.findIndex(item => item.title == data.title)
       if (index == -1) {
         state.routerList.push(data);

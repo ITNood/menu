@@ -57,7 +57,7 @@ export default {
   },
   watch: {
     $route(newValue, oldValue) {
-      console.log('newValue', newValue);
+      ;
       this.setTags(newValue);
     },
   },
@@ -83,7 +83,7 @@ export default {
           item.current = false;
         }
       });
-      console.log('current', this.getrouterList);
+      ;
     },
     handleCloseTag(tag) {
       //关闭标签
@@ -94,7 +94,7 @@ export default {
         if (index === -1) {
           this.$router.push({ title: '首页' });
         } else if (this.$route.path === tag.path) {
-          console.log('this.$route.path', this.$route.path);
+          ;
           if (index === this.getrouterList.length - 1) {
             // 最后一个 往前一个挪
             this.$router.push(this.getrouterList[index - 1].path);
@@ -130,7 +130,7 @@ export default {
       });
     },
     handleCommand(command) {
-      console.log(command);
+      ;
       if (command == 'b') {
         sessionStorage.removeItem('userInfo');
         this.$router.push('/login');

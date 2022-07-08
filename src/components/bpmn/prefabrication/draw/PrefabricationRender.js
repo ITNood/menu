@@ -19,7 +19,7 @@ export default function Prefabrication(eventBus, prefabricationPaletteExtendPara
     };
 
     this.drawShape = function (parent, shape) {
-        console.log("shape", elementByType, shape)
+        
         let extendOption = {}
         let param = elementByType[shape.type + "|" + (shape.businessObject.ref ? shape.businessObject.ref : "")]
         if (param) {

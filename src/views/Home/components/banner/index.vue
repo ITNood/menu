@@ -109,7 +109,7 @@ export default {
         startTime: '',
         name: '',
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 200,
         type: 'select',
         category: 0,
       },
@@ -129,7 +129,7 @@ export default {
         deployTime: '',
         name: '',
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 200,
         type: 'select',
         category: group + type.id,
       };
@@ -219,7 +219,7 @@ export default {
           },
         });
 
-        console.log(bpmn.injector._instances, bpmn.get('editorActions'));
+        ;
         this.allViewerCache[container] = bpmn;
         bpmn.importXML(xml).then(() => {
           bpmn.get('canvas').zoom('fit-viewport', 'auto');

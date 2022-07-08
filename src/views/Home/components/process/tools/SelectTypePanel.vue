@@ -1,17 +1,18 @@
 <template xmlns:el-col="http://www.w3.org/1999/html">
   <div>
     <el-dialog title="选择流程"
-      :visible.sync="dialogVisible"
-      width="90%"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      append-to-body>
+               :visible.sync="dialogVisible"
+               width="90%"
+               :close-on-click-modal="false"
+               :close-on-press-escape="false"
+               :show-close="false"
+               append-to-body>
       <!-- 面包屑 / 当前所在位置导航 -->
       <el-row>
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item v-for="(item,index) in breadcrumb"
-            :key="index"><a v-on:click="choiceTypeByNameClick(item,index)">{{ item }}</a></el-breadcrumb-item>
+                              :key="index"><a v-on:click="choiceTypeByNameClick(item,index)">{{ item }}</a>
+          </el-breadcrumb-item>
         </el-breadcrumb>
       </el-row>
       <el-divider></el-divider>
@@ -19,20 +20,20 @@
         <el-col :span="20">
           <el-row v-if="selectTypes && selectTypes.status && selectTypes.status === 'Active'">
             <el-col :span="4"
-              v-for="(element, index) in selectTypes.childNode"
-              :key="index"
-              :offset="index%4 > 0 ? 2 : 1">
+                    v-for="(element, index) in selectTypes.childNode"
+                    :key="index"
+                    :offset="index%4 > 0 ? 2 : 1">
               <el-card :shadow="(planType.id === element.id)?'always':'hover'"
-                style="margin-bottom: 20px"
-                :style="(planType.id === element.id)?{border:'1px solid #0ff'}:{}">
+                       style="margin-bottom: 20px"
+                       :style="(planType.id === element.id)?{border:'1px solid #0ff'}:{}">
                 <el-row :gutter="20"
-                  type="flex"
-                  justify="space-around">
+                        type="flex"
+                        justify="space-around">
                   <el-col v-if="element.preview"
-                    :span="10">
+                          :span="10">
                     <el-image :src="element.preview"
-                      fit="cover"
-                      style="max-width: 100px" />
+                              fit="cover"
+                              style="max-width: 100px"/>
                   </el-col>
                   <!--                  <el-col :span="1"></el-col>-->
                   <el-col :span="element.preview?14:24">
@@ -41,13 +42,14 @@
                     </el-row>
                     <el-row style="text-align: center">
                       <el-col :span="12"
-                        v-if="element.childNode.length">
+                              v-if="element.childNode.length">
                         <el-button v-on:click="choiceTypeClick(element)"
-                          size="mini">展开</el-button>
+                                   size="mini">展开
+                        </el-button>
                       </el-col>
                       <el-col :span="element.childNode.length?12:24">
                         <el-button size="mini"
-                          v-on:click="plannedTypeClick(element)">
+                                   v-on:click="plannedTypeClick(element)">
                           {{ (planType.id === element.id) ? '已选定' : '选定' }}
                         </el-button>
                       </el-col>
@@ -59,7 +61,7 @@
           </el-row>
         </el-col>
         <el-col :span="4"
-          v-if="Object.keys(planType).length">
+                v-if="Object.keys(planType).length">
           <el-col>
             <el-form>
               <el-form-item label="已选中：">{{ planType.moduleName ? (planType.moduleName) : '' }}</el-form-item>
@@ -68,42 +70,57 @@
           </el-col>
           <el-col>
             <el-button type="text"
-              icon="el-icon-plus"
-              @click="onSelect(null,null)">创建一个新的流程</el-button>
+                       icon="el-icon-plus"
+                       @click="onSelect(null,null)">创建一个新的流程 (新创建)
+            </el-button>
           </el-col>
           <el-col>
             <el-button type="text"
-              icon="el-icon-star-on"
-              @click="selectTemplate">选择模板</el-button>
+                       icon="el-icon-star-on"
+                       @click="()=>{this.selectionCanSaveId=false;selectTemplate()}">依据模板创建新流程 (新创建)
+            </el-button>
           </el-col>
           <el-col>
             <el-button type="text"
-              icon="el-icon-search"
-              @click="selectHistory">使用历史流程</el-button>
+                       icon="el-icon-search"
+                       @click="()=>{this.selectionCanSaveId=false;selectHistory()}">依据历史流程创建新流程 (新创建)
+            </el-button>
+          </el-col>
+          <el-col v-if="canRef">
+            <el-button type="text"
+                       icon="el-icon-link"
+                       @click="()=>{this.selectionCanSaveId=true;selectTemplate()}">引用模板 (引用)
+            </el-button>
+          </el-col>
+          <el-col v-if="canRef">
+            <el-button type="text"
+                       icon="el-icon-link"
+                       @click="()=>{this.selectionCanSaveId=true;selectHistory()}">引用历史记录 (引用)
+            </el-button>
           </el-col>
         </el-col>
       </el-row>
-      <!--      <span slot="footer" class="dialog-footer">-->
-      <!--        <el-button @click="dialogVisible = false">{{ $t('el.messagebox.cancel') }}</el-button>-->
-      <!--        <el-button type="primary" @click="dialogVisible = false">{{ $t('el.messagebox.confirm') }}</el-button>-->
-      <!--      </span>-->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false;$emit('cleanCreate')">{{ $t('el.messagebox.cancel') }}</el-button>
+      </span>
     </el-dialog>
     <banner ref="selectProcessBanner"
-      @onSelect="onSelect" />
+            @onSelect="onSelect"/>
   </div>
 </template>
 
 <script>
 import 'element-ui/lib/theme-chalk/base.css';
-import { list } from '@/api/process/menu';
+import {list} from '@/api/process/menu';
 import Banner from '../../banner/index.vue';
 
 // 用于选择流程类型和配置相关属性
 export default {
   name: 'SelectTypePanel',
-  components: { Banner },
+  components: {Banner},
   props: {
     defaultVisible: Boolean,
+    canRef: Boolean,
   },
   watch: {
     defaultVisible(newVal) {
@@ -112,6 +129,7 @@ export default {
   },
   data() {
     return {
+      selectionCanSaveId: false,
       dialogVisible: this.defaultVisible,
       types: [],
       selectTypes: {},
@@ -131,6 +149,9 @@ export default {
     },
     onSelect(xml, id) {
       if (this.planType) {
+        if (!this.selectionCanSaveId) {
+          id = null;
+        }
         this.convertType2BpmnConfig();
         this.dialogVisible = false;
         this.$emit('onSelect', this.planType, xml, id);
@@ -162,7 +183,7 @@ export default {
       if (index != 0) {
         for (let sliceElement of [...this.breadcrumb.slice(1, index + 1)]) {
           let findItem = selectTypes.childNode.find(
-            (i) => i.moduleName == sliceElement
+              (i) => i.moduleName == sliceElement
           );
           if (findItem) {
             selectTypes = findItem;
@@ -185,11 +206,9 @@ export default {
         if (this.planType.childNode.length) {
           prefabricationPaletteExtendParam['ref:separator:top'] = 'ref';
           this.planType.childNode.forEach((item) => {
-            prefabricationPaletteExtendParam[
-              'create.ref-service_task' + item.id
-            ] = {
-              type: 'refBpmn:RefServiceTask',
-              group: 'ref' + item.id,
+            prefabricationPaletteExtendParam['create.ref-service_task' + item.id] = {
+              type: 'bpmn:Task',
+              group: 'ref',
               title: item.moduleName,
               className: 'customer-element',
               icoImageUrl: item.icon,

@@ -6,8 +6,8 @@
   "types": [
     {
       "name": "RefServiceTask",
-      "superClass": [
-        "bpmn:ServiceTask"
+      "extends": [
+        "bpmn:Task"
       ],
       "properties": [
         {
