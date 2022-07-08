@@ -57,7 +57,6 @@ export default {
   },
   watch: {
     $route(newValue, oldValue) {
-      ;
       this.setTags(newValue);
     },
   },
@@ -130,9 +129,8 @@ export default {
       });
     },
     handleCommand(command) {
-      ;
       if (command == 'b') {
-        sessionStorage.removeItem('userInfo');
+        sessionStorage.removeItem('token');
         this.$router.push('/login');
       }
     },
