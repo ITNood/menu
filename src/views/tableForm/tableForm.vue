@@ -61,17 +61,21 @@ export default {
     //删除
     del() {
       console.log(this.multipleSelection);
-      this.$confirm('确定要删除选中的数据吗 ?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      })
-        .then(() => {
-          this.$message.success('删除成功');
+      if (this.multipleSelection.length > 0) {
+        this.$confirm('确定要删除选中的数据吗 ?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
         })
-        .catch(() => {
-          this.$message.info('取消了删除');
-        });
+          .then(() => {
+            this.$message.success('删除成功');
+          })
+          .catch(() => {
+            this.$message.info('取消了删除');
+          });
+      } else {
+        this.$message.error('请选择要删除的数据');
+      }
     },
     //新增
     add() {
@@ -105,6 +109,5 @@ export default {
   },
 };
 </script>
-
-<style lang="less" scoped>
+<style scoped>
 </style>

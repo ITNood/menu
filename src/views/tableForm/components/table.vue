@@ -17,6 +17,7 @@
       @click="exoprt">导出</el-button>
 
     <el-table :data="tableData"
+      id="dataForm"
       @selection-change="handleSelectionChange"
       style="margin-top:15px"
       border>
