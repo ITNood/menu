@@ -22,7 +22,7 @@
         </el-form-item>
         <el-form-item label="开始时间"
           prop="deployTime">
-          <!--          <el-date-picker clearable size="small" v-model="queryParams.deployTime" type="date"-->
+          <!--          <el-date-picker clearable size="small" v-model="queryParams.deployTime" type="date"></el-date-picker>-->
         </el-form-item>
 
         <el-form-item>
@@ -89,7 +89,6 @@ import {
   PrefabricationReaderModule,
   PrefabricationTranslateModule,
 } from '@/components/bpmn/prefabrication';
-
 // 通过鼠标移动画布
 import MoveCanvasModule from 'diagram-js/lib/navigation/movecanvas';
 // 编辑器事件，在使用键盘组件时需要添加
@@ -106,7 +105,7 @@ export default {
   data() {
     return {
       queryParams: {
-        startTime: '',
+        deployTime: '',
         name: '',
         pageNum: 1,
         pageSize: 10,
@@ -164,11 +163,7 @@ export default {
     //选择版本号
     changeVersion(val) {
       let nowSelect = this.dataRows[this.carouselIndex];
-      const data = nowSelect.vesrionsList.filter((item) => {
-        if (item.version == val) {
-          return item;
-        }
-      })[0];
+      const data = nowSelect.vesrionsList.filter((item) => item.version == val);
       Object.keys(nowSelect).forEach((i) => {
         if (i !== 'vesrionsList') {
           nowSelect[i] = data[i];
@@ -218,7 +213,6 @@ export default {
             ...PrefabricationModuleDescriptor,
           },
         });
-
         console.log(bpmn.injector._instances, bpmn.get('editorActions'));
         this.allViewerCache[container] = bpmn;
         bpmn.importXML(xml).then(() => {

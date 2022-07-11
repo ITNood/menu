@@ -2,8 +2,7 @@
   <div>
     <el-container>
       <el-aside width="220px">
-        <Menu :routes="route"
-          :isCollapse="collapse" />
+        <Menu :routes="route" />
       </el-aside>
       <el-container>
         <el-header>
@@ -50,7 +49,6 @@ export default {
   data() {
     return {
       route: [],
-      collapse: false,
       avatar: require('../../assets/logo.png'),
       tags: [],
     };
@@ -84,7 +82,6 @@ export default {
         if (index === -1) {
           this.$router.push({ title: '首页' });
         } else if (this.$route.path === tag.path) {
-          console.log('this.$route.path', this.$route.path);
           if (index === this.getrouterList.length - 1) {
             // 最后一个 往前一个挪
             this.$router.push(this.getrouterList[index - 1].path);

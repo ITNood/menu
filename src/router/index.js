@@ -46,6 +46,15 @@ const routes = [
           }
         ]
       },
+      {
+        path: '/tableForm',
+        name: 'tableForm',
+        component: () => import('../views/tableForm/tableForm.vue'),
+        meta: {
+          title: '表单',
+          icon: 'el-icon-menu'
+        }
+      }
     ]
   },
   {
@@ -65,9 +74,9 @@ router.beforeEach((to, from, next) => {
   if (to.path == "/login") {
     next();
   } else {
-    const info = sessionStorage.getItem('token')
+    const token = sessionStorage.getItem('token')
     //否则判断用户是否已经登录,注意这里是字符串判断
-    if (info) {
+    if (token) {
       next();
     }
     //如果用户访问的是受保护的资源，且没有登录，则跳转到登录页面
