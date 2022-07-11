@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div>
     <search :form="form"
       @search="search" />
@@ -19,8 +19,8 @@
       @submit="submit" />
   </div>
 </template>
-
-<script>
+ 
+ <script>
 import Search from './components/search';
 import TableForm from './components/table';
 import Pagenation from '../../components/page/pagenation';
@@ -109,5 +109,6 @@ export default {
   },
 };
 </script>
-<style scoped>
+ 
+ <style  scoped>
 </style>

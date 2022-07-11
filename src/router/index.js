@@ -47,9 +47,9 @@ const routes = [
         ]
       },
       {
-        path: '/tableForm',
-        name: 'tableForm',
-        component: () => import('../views/tableForm/tableForm.vue'),
+        path: '/tables',
+        name: 'tables',
+        component: () => import('../views/tableForm/tables.vue'),
         meta: {
           title: '表单',
           icon: 'el-icon-menu'
