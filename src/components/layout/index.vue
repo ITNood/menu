@@ -72,6 +72,14 @@ export default {
     ...mapActions(['addRouter', 'deleteRouter']),
     tabs(path) {
       this.$router.push(path);
+      //tag标签对应当前路由背景色
+      this.getrouterList.map((item) => {
+        if (item.path === path) {
+          item.current = true;
+        } else {
+          item.current = false;
+        }
+      });
     },
     handleCloseTag(tag) {
       //关闭标签

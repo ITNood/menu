@@ -23,20 +23,25 @@
         <el-form-item label="开始时间"
           prop="deployTime">
           <!--          <el-date-picker clearable size="small" v-model="queryParams.deployTime" type="date"></el-date-picker>-->
+          prop="deployTime">
+          <!--          <el-date-picker clearable size="small" v-model="queryParams.deployTime" type="date"-->
         </el-form-item>
 
         <el-form-item>
           <el-button type="primary"
             icon="el-icon-search"
             size="mini"
-            @click="handleQuery">搜索</el-button>
+            @click="handleQuery">搜索
+          </el-button>
           <el-button icon="el-icon-refresh"
             size="mini"
-            @click="resetQuery('queryParams')">重置</el-button>
+            @click="resetQuery('queryParams')">重置
+          </el-button>
         </el-form-item>
       </el-form>
 
       <el-carousel height="600px"
+        style="margin-bottom: 30px"
         :initial-index="carouselIndex"
         :autoplay="false"
         indicator-position="none"
@@ -53,23 +58,41 @@
         <el-form :model="dataRows[carouselIndex]"
           ref="newForm"
           :inline="true">
-          <el-form-item label="名称："
-            prop="idName">
-            <el-input disabled
-              :value="dataRows[carouselIndex].processName"
-              width="200px"></el-input>
-          </el-form-item>
-          <el-form-item label="版本号："
-            prop="version"
-            v-if="dataRows[carouselIndex].vesrionsList">
-            <el-select :value="dataRows[carouselIndex].version"
-              @change="changeVersion">
-              <el-option v-for="(list,index) in dataRows[carouselIndex].vesrionsList"
-                :key="index"
-                :value="list.version"
-                :label="list.version"></el-option>
-            </el-select>
-          </el-form-item>
+          <el-row :gutter="2"
+            type="flex"
+            justify="space-between">
+            <el-col :span="12">
+              <el-form-item label="名称："
+                prop="idName">
+                <el-input disabled
+                  :value="dataRows[carouselIndex].processName"
+                  width="200px"></el-input>
+              </el-form-item>
+              <el-form-item label="版本号："
+                prop="version"
+                v-if="dataRows[carouselIndex].vesrionsList">
+                <el-select :value="dataRows[carouselIndex].version"
+                  @change="changeVersion">
+                  <el-option v-for="(list,index) in dataRows[carouselIndex].vesrionsList"
+                    :key="index"
+                    :value="list.version"
+                    :label="list.version"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10">
+              <el-pagination background
+                small
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="queryParams.pageNum"
+                :page-sizes="[5,10, 20, 30, 40]"
+                :page-size="queryParams.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="queryParams.total">
+              </el-pagination>
+            </el-col>
+          </el-row>
         </el-form>
       </div>
       <span slot="footer"
@@ -108,9 +131,10 @@ export default {
         deployTime: '',
         name: '',
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 5,
         type: 'select',
         category: 0,
+        total: 0,
       },
       allViewerCache: {},
       carouselIndex: 0,
@@ -128,9 +152,10 @@ export default {
         deployTime: '',
         name: '',
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 5,
         type: 'select',
         category: group + type.id,
+        total: 0,
       };
       this.dialogVisible = true;
       this.getList();
@@ -153,6 +178,7 @@ export default {
     getList() {
       this.dataRows = [];
       processList(this.queryParams).then((response) => {
+        this.queryParams.total = response.total;
         this.carouselIndex = 0;
         this.dataRows = response.rows ?? [];
         if (this.dataRows.length) {
@@ -213,7 +239,6 @@ export default {
             ...PrefabricationModuleDescriptor,
           },
         });
-        console.log(bpmn.injector._instances, bpmn.get('editorActions'));
         this.allViewerCache[container] = bpmn;
         bpmn.importXML(xml).then(() => {
           bpmn.get('canvas').zoom('fit-viewport', 'auto');
@@ -230,6 +255,15 @@ export default {
       this.$refs[queryParams].resetFields();
       this.handleQuery();
     },
+
+    handleSizeChange(val) {
+      this.queryParams.pageSize = val;
+      this.getList();
+    },
+    handleCurrentChange(val) {
+      this.queryParams.pageNum = val;
+      this.getList();
+    },
   },
 };
 </script>
@@ -237,6 +271,5 @@ export default {
 .bpmnDiv {
   background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+');
   height: 600px;
-  width: 90%;
 }
 </style>

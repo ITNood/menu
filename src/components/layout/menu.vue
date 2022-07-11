@@ -55,7 +55,7 @@ export default {
         return this.$route.fullPath;
       },
       set: function (newVal) {
-        console.log('newVal', newVal);
+        ;
       },
     },
   },
@@ -66,7 +66,7 @@ export default {
       }
     },
     openMenus(key, keyPath) {
-      console.log(key, keyPath);
+      ;
     },
   },
 };

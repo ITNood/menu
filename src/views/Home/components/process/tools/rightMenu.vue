@@ -218,7 +218,7 @@ export default {
 
     //折叠
     handleChange(val) {
-      console.log(val);
+      ;
     },
     //单选
     selectionChange(row) {

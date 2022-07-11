@@ -38,7 +38,6 @@ PrefabricationPaletteProvider.prototype.getPaletteEntries = function () {
                               className = 'bpmn-icon-subprocess-expanded',
                               title, icoImageUrl = null, options, index
                           }) {
-
         function createListener(event) {
             var shape = elementFactory.createShape(assign({type: type}, options));
             modeling.updateProperties(shape, {ref: index,name:title})
@@ -48,7 +47,6 @@ PrefabricationPaletteProvider.prototype.getPaletteEntries = function () {
             }
             create.start(event, shape);
         }
-
         var shortType = type.replace(/^bpmn:/, '');
         return {
             group: group,

@@ -2,6 +2,7 @@
   <div>
     <el-dialog :title="title"
       :visible.sync="show"
+      :close-on-click-modal="false"
       width="40%">
 
       <el-form :model="dataForm"

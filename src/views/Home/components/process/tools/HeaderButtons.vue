@@ -151,9 +151,15 @@
                    icon="el-icon-refresh-right"
                    @click="processRedo()"/>
       </el-tooltip>
-      <!--      <el-tooltip effect="light" content="重新绘制">-->
-      <!--        <el-button :size="size" icon="el-icon-refresh" @click="processRestart"/>-->
-      <!--      </el-tooltip>-->
+      <el-tooltip effect="light" content="重新绘制">
+        <el-button :size="size" icon="el-icon-refresh" @click="$emit('newXml',bpmn)"/>
+      </el-tooltip>
+    </el-button-group>
+    <el-button-group>
+      <el-button :size="size"
+                 :type="type"
+                 @click="saveProcess()">保存
+      </el-button>
     </el-button-group>
   </div>
 </template>
@@ -161,11 +167,13 @@
 <script>
 import convert from 'xml-js';
 import 'highlight.js/styles/googlecode.css';
+import {save} from '@/api/process/index';
 
 export default {
   name: 'HeaderButtons',
   props: {
     bpmn: Object,
+    processType: String,
     size: {
       type: String,
       default: 'small',
@@ -224,7 +232,7 @@ export default {
       reader.readAsText(file);
       reader.onload = function () {
         let xmlStr = this.result;
-        that.$emit("newXml",that.bpmn, xmlStr);
+        that.$emit("newXml", that.bpmn, xmlStr);
       };
     },
     // 下载流程图到本地
@@ -351,6 +359,20 @@ export default {
         this.previewResult = convert.xml2json(xml, {spaces: 2});
         this.previewType = 'json';
         this.previewModelVisible = true;
+      });
+    },
+    saveProcess() {
+      this.bpmn.saveXML().then(({xml}) => {
+        let process = this.bpmn.get('canvas').getRootElements()[0]
+        let data = {
+          name: process.businessObject.get("name"),
+          category: this.processType,
+          processKey: process.id,
+          xml
+        }
+        save(data).then((response) => {
+          console.log(response)
+        })
       });
     },
   },

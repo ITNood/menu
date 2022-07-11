@@ -1,15 +1,18 @@
 <template>
   <div>
     <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn" :bpmn="bpmnProp.bpmn"
+                    :processType="''+selectType.id"
                     :min-zoom="0.1" :max-zoom="4" @newXml="importXML"/>
     <div class="containers" ref="containers">
-      <div class="canvas" ref="canvas" id="canvas"></div>
+      <div class="canvas" :ref="bpmnProp.container" id="canvas"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
       <right-menu @toggleFlow="reSelectChildren" :panel-types="selectType" :elements="selectElements"
                   :bpmn="bpmnProp.bpmn"
                   @changeField="changeField"/>
     </div>
-    <select-type-panel ref="typeSelect" @onSelect="typeSelect" :default-visible="selectTypePanelDefaultVisible"/>
+    <select-type-panel ref="typeSelect" @onSelect="typeSelect"
+                       :default-visible="selectTypePanelDefaultVisible" :canRef="protect"
+                       @cleanCreate="()=>{if(!protect){$emit('cleanCreate')}}"/>
   </div>
 </template>
 <script>
@@ -18,11 +21,12 @@
  */
 import 'bpmn-js/dist/assets/diagram-js.css'; // 左边工具栏外框样式
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'; // 左边工具栏元素样式
+import 'bpmn-js-color-picker/colors/color-picker.css'; // 左边工具栏元素样式
 /**
  * Plugins
  */
 import HeaderButtons from './tools/HeaderButtons';
-import RightMenu from './rightMenu.vue';
+import RightMenu from './tools/rightMenu.vue';
 import SelectTypePanel from './tools/SelectTypePanel';
 /**
  * Bpmn And Bpmn Extend
@@ -34,14 +38,12 @@ import {
   PrefabricationReaderModule,
   PrefabricationTranslateModule,
 } from '@/components/bpmn/prefabrication';
+import BpmnColorPickerModule from 'bpmn-js-color-picker';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 
 export default {
   name: 'bpmn',
-
-  //
   components: {SelectTypePanel, HeaderButtons, RightMenu},
-
   data() {
     return {
       // 定制的元素标准颜色在不同场景下
@@ -99,22 +101,18 @@ export default {
   methods: {
     typeSelect(selectType, xml, id) {
       if (this.protect) {
-        console.log(selectType, id)
-        // 开启新的页面
-        if (xml) {
-          this.bpmnProp.modules.modeling.updateProperties(this.selectElements[this.rightMenuSelectIndex], {
-            ref: selectType.id,
-            refId: id
-          });
-        } else {
-          // 开启新页面 TODO
-
-          // 处理新页面内容
-          this.newTabInit(selectType, xml, id)
+        if (!id) {
+          id = this.createNewProcessId();
+          this.$emit("createNewBpmn", selectType, xml, id)
         }
+        // 开启新的页面
+        this.bpmnProp.modules.modeling.updateProperties(this.selectElements[this.rightMenuSelectIndex], {
+          ref: selectType.id,
+          refId: id
+        });
       } else {
         this.selectType = selectType;
-        this.init(xml, selectType.bpmnConf);
+        this.init(xml, selectType.bpmnConf, id);
       }
     },
     newTabInit(selectType, xml, id) {
@@ -128,18 +126,19 @@ export default {
      * @param xml
      * @param conf
      */
-    init(xml, conf) {
+    init(xml, conf, id) {
       let props = this.bpmnProp;
       let that = this;
 
       if (props.bpmn) {
         props.bpmn.destroy();
       }
-
+      console.log(this)
       props.bpmn = new BpmnModeler({
         container: that.$refs[props.container],
-        // keyboard: props.keyboard ?? {bindTo: props.keyboardDefaultBindTo},
+        keyboard: props.keyboard ?? {bindTo: document},
         additionalModules: [
+          BpmnColorPickerModule,
           PrefabricationTranslateModule,
           PrefabricationPaletteModule,
           PrefabricationReaderModule,
@@ -155,7 +154,7 @@ export default {
       );
 
       that.initListeners();
-      that.importXML(props.bpmn, xml);
+      that.importXML(props.bpmn, xml, id);
     },
 
     /**
@@ -163,18 +162,31 @@ export default {
      * @param bpmn
      * @param xml
      */
-    async importXML(bpmn, xml) {
+    async importXML(bpmn, xml, id) {
+      if (!id) {
+        id = this.createNewProcessId();
+      }
       if (xml) {
-        await bpmn.importXML(xml);
+        await bpmn.importXML(xml).then(() => {
+          bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {id: id, isExecutable: true,
+            name: 'New'+ id,});
+        });
       } else {
         if (bpmn.createDiagram) {
           await bpmn.createDiagram().then(() => {
-            bpmn.get('elementRegistry').updateId(bpmn.get('canvas').getRootElements()[0], 'Process_' + Date.now().valueOf());
+            bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {
+              id: id,
+              name: 'New'+ id,
+              isExecutable: true
+            });
           });
         }
       }
     },
 
+    createNewProcessId() {
+      return 'Process_' + Date.now().valueOf()
+    },
     /**
      * 一些固定需要的监听方法
      */
@@ -189,7 +201,7 @@ export default {
 
       props.modules.eventBus.on("element.updateProperties", (element) => {
         // 数据更新后
-        console.log("updateProperties")
+
         let newValue = this.selectElements;
         this.selectElements = [];
         this.selectElements = newValue;
@@ -199,6 +211,7 @@ export default {
         this.selectElements = event.newSelection.length
             ? event.newSelection
             : this.bpmnProp.modules.canvas.getRootElements();
+        console.log(this.selectElements)
       });
 
       props.modules.eventBus.on('connection.changed', ({element}) => {
@@ -438,6 +451,9 @@ export default {
      * @param type
      */
     changeField(element, type) {
+      if(element.type === 'bpmn:Process'){
+        return;
+      }
       let isImperfect = false;
       let isUnSave = false;
       let isUnCheck = true;
@@ -484,8 +500,18 @@ export default {
 }
 
 .djs-palette {
-  width: 96px;
+  //width: 103px;
+  max-height: 90%;
+  overflow: auto;
 }
+
+.djs-palette::-webkit-scrollbar {
+  width: 0px;
+  color: transparent;
+}
+
+//.djs-palette .djs-palette-entries {
+//}
 
 .properties-panel-parent {
   display: block;
