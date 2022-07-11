@@ -21,6 +21,7 @@
  */
 import 'bpmn-js/dist/assets/diagram-js.css'; // 左边工具栏外框样式
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'; // 左边工具栏元素样式
+import 'bpmn-js-color-picker/colors/color-picker.css'; // 左边工具栏元素样式
 /**
  * Plugins
  */
@@ -37,6 +38,7 @@ import {
   PrefabricationReaderModule,
   PrefabricationTranslateModule,
 } from '@/components/bpmn/prefabrication';
+import BpmnColorPickerModule from 'bpmn-js-color-picker';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
 
 export default {
@@ -134,8 +136,9 @@ export default {
       console.log(this)
       props.bpmn = new BpmnModeler({
         container: that.$refs[props.container],
-        // keyboard: props.keyboard ?? {bindTo: document},
+        keyboard: props.keyboard ?? {bindTo: document},
         additionalModules: [
+          BpmnColorPickerModule,
           PrefabricationTranslateModule,
           PrefabricationPaletteModule,
           PrefabricationReaderModule,
@@ -448,19 +451,22 @@ export default {
      * @param type
      */
     changeField(element, type) {
-      // let isImperfect = false;
-      // let isUnSave = false;
-      // let isUnCheck = true;
-      // let isSuccess = true;
-      // if (isImperfect) {
-      //   this.changeColor(this.elementColorEnum.imperfect, element);
-      // } else if (isUnSave) {
-      //   this.changeColor(this.elementColorEnum.unSave, element);
-      // } else if (isUnCheck) {
-      //   this.changeColor(this.elementColorEnum.unCheck, element);
-      // } else if (isSuccess) {
-      //   this.changeColor(this.elementColorEnum.complete, element);
-      // }
+      if(element.type === 'bpmn:Process'){
+        return;
+      }
+      let isImperfect = false;
+      let isUnSave = false;
+      let isUnCheck = true;
+      let isSuccess = true;
+      if (isImperfect) {
+        this.changeColor(this.elementColorEnum.imperfect, element);
+      } else if (isUnSave) {
+        this.changeColor(this.elementColorEnum.unSave, element);
+      } else if (isUnCheck) {
+        this.changeColor(this.elementColorEnum.unCheck, element);
+      } else if (isSuccess) {
+        this.changeColor(this.elementColorEnum.complete, element);
+      }
     },
 
     reSelectChildren(index) {

@@ -1,88 +1,104 @@
 <template>
   <div v-if="dialogVisible">
     <el-dialog title="提示"
-      :visible.sync="dialogVisible"
-      width="60%"
-      id="stepChild"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false">
+               :visible.sync="dialogVisible"
+               width="60%"
+               id="stepChild"
+               :close-on-click-modal="false"
+               :close-on-press-escape="false"
+               :show-close="false">
       <!--查询-->
       <el-form :model="queryParams"
-        ref="queryForm"
-        :inline="true"
-        label-width="68px">
+               ref="queryForm"
+               :inline="true"
+               label-width="68px">
         <el-form-item label="名称"
-          prop="name">
+                      prop="name">
           <el-input v-model="queryParams.name"
-            placeholder="请输入名称"
-            clearable
-            size="small"
-            @keyup.enter.native="handleQuery" />
+                    placeholder="请输入名称"
+                    clearable
+                    size="small"
+                    @keyup.enter.native="handleQuery"/>
         </el-form-item>
         <el-form-item label="开始时间"
-          prop="deployTime">
+                      prop="deployTime">
           <!--          <el-date-picker clearable size="small" v-model="queryParams.deployTime" type="date"-->
         </el-form-item>
 
         <el-form-item>
           <el-button type="primary"
-            icon="el-icon-search"
-            size="mini"
-            @click="handleQuery">搜索</el-button>
+                     icon="el-icon-search"
+                     size="mini"
+                     @click="handleQuery">搜索
+          </el-button>
           <el-button icon="el-icon-refresh"
-            size="mini"
-            @click="resetQuery('queryParams')">重置</el-button>
+                     size="mini"
+                     @click="resetQuery('queryParams')">重置
+          </el-button>
         </el-form-item>
       </el-form>
 
-      <el-carousel height="600px"
-        :initial-index="carouselIndex"
-        :autoplay="false"
-        indicator-position="none"
-        @change="change">
+      <el-carousel height="600px"  style="margin-bottom: 30px"
+                   :initial-index="carouselIndex"
+                   :autoplay="false"
+                   indicator-position="none"
+                   @change="change">
         <el-carousel-item v-for="(item,index) in dataRows"
-          :key="index">
-          <div class="bpmnDiv"
-            :ref="'viewer'+ index"></div>
+                          :key="index">
+          <div class="bpmnDiv" :ref="'viewer'+ index"></div>
         </el-carousel-item>
       </el-carousel>
 
       <div class="news"
-        v-if="dataRows[carouselIndex]">
+           v-if="dataRows[carouselIndex]">
         <el-form :model="dataRows[carouselIndex]"
-          ref="newForm"
-          :inline="true">
-          <el-form-item label="名称："
-            prop="idName">
-            <el-input disabled
-              :value="dataRows[carouselIndex].processName"
-              width="200px"></el-input>
-          </el-form-item>
-          <el-form-item label="版本号："
-            prop="version"
-            v-if="dataRows[carouselIndex].vesrionsList">
-            <el-select :value="dataRows[carouselIndex].version"
-              @change="changeVersion">
-              <el-option v-for="(list,index) in dataRows[carouselIndex].vesrionsList"
-                :key="index"
-                :value="list.version"
-                :label="list.version"></el-option>
-            </el-select>
-          </el-form-item>
+                 ref="newForm"
+                 :inline="true">
+          <el-row :gutter="2" type="flex" justify="space-between">
+            <el-col :span="12">
+              <el-form-item label="名称："
+                            prop="idName">
+                <el-input disabled
+                          :value="dataRows[carouselIndex].processName"
+                          width="200px"></el-input>
+              </el-form-item>
+              <el-form-item label="版本号："
+                            prop="version"
+                            v-if="dataRows[carouselIndex].vesrionsList">
+                <el-select :value="dataRows[carouselIndex].version"
+                           @change="changeVersion">
+                  <el-option v-for="(list,index) in dataRows[carouselIndex].vesrionsList"
+                             :key="index"
+                             :value="list.version"
+                             :label="list.version"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10">
+              <el-pagination background small
+                             @size-change="handleSizeChange"
+                             @current-change="handleCurrentChange"
+                             :current-page="queryParams.pageNum"
+                             :page-sizes="[5,10, 20, 30, 40]"
+                             :page-size="queryParams.pageSize"
+                             layout="total, sizes, prev, pager, next, jumper"
+                             :total="queryParams.total">
+              </el-pagination>
+            </el-col>
+          </el-row>
         </el-form>
       </div>
       <span slot="footer"
-        class="dialog-footer">
+            class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
         <el-button type="primary"
-          @click="selection">确 定</el-button>
+                   @click="selection">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
-import { list as processList } from '@/api/process';
+import {list as processList} from '@/api/process';
 import BpmnViewer from 'bpmn-js/lib/Viewer';
 import {
   PrefabricationModuleDescriptor,
@@ -109,9 +125,10 @@ export default {
         startTime: '',
         name: '',
         pageNum: 1,
-        pageSize: 200,
+        pageSize: 5,
         type: 'select',
         category: 0,
+        total: 0
       },
       allViewerCache: {},
       carouselIndex: 0,
@@ -120,7 +137,8 @@ export default {
       dialogVisible: false,
     };
   },
-  created() {},
+  created() {
+  },
   methods: {
     open(group, type) {
       // 获取相关菜单ID的视图数据
@@ -129,9 +147,10 @@ export default {
         deployTime: '',
         name: '',
         pageNum: 1,
-        pageSize: 200,
+        pageSize: 5,
         type: 'select',
         category: group + type.id,
+        total: 0
       };
       this.dialogVisible = true;
       this.getList();
@@ -141,9 +160,9 @@ export default {
       that.dialogVisible = false;
       if (that.dataRows[that.carouselIndex]) {
         that.$emit(
-          'onSelect',
-          that.dataRows[that.carouselIndex].readXml,
-          that.dataRows[that.carouselIndex].definitionId
+            'onSelect',
+            that.dataRows[that.carouselIndex].readXml,
+            that.dataRows[that.carouselIndex].definitionId
         );
       }
     },
@@ -154,6 +173,7 @@ export default {
     getList() {
       this.dataRows = [];
       processList(this.queryParams).then((response) => {
+        this.queryParams.total = response.total
         this.carouselIndex = 0;
         this.dataRows = response.rows ?? [];
         if (this.dataRows.length) {
@@ -186,8 +206,8 @@ export default {
     reloadViewer() {
       this.$nextTick(() => {
         this.createViewer(
-          'viewer' + this.carouselIndex,
-          this.dataRows[this.carouselIndex].readXml
+            'viewer' + this.carouselIndex,
+            this.dataRows[this.carouselIndex].readXml
         );
       });
     },
@@ -201,7 +221,7 @@ export default {
         let ref = that.$refs[container][0];
         let bpmn = new BpmnViewer({
           container: ref,
-          keyboard: { bindTo: document },
+          keyboard: {bindTo: document},
           additionalModules: [
             MoveCanvasModule,
             KeyboardMoveModule,
@@ -211,7 +231,7 @@ export default {
             PrefabricationTranslateModule,
             PrefabricationReaderModule,
             ...(this.selectType.bpmnConf?.additionalModules ?? [
-              { prefabricationPaletteExtendParam: ['value', {}] },
+              {prefabricationPaletteExtendParam: ['value', {}]},
             ]),
           ],
           moddleExtensions: {
@@ -236,6 +256,15 @@ export default {
       this.$refs[queryParams].resetFields();
       this.handleQuery();
     },
+
+    handleSizeChange(val) {
+      this.queryParams.pageSize = val;
+      this.getList();
+    },
+    handleCurrentChange(val) {
+      this.queryParams.pageNum = val;
+      this.getList();
+    },
   },
 };
 </script>
@@ -243,6 +272,5 @@ export default {
 .bpmnDiv {
   background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+');
   height: 600px;
-  width: 90%;
 }
 </style>

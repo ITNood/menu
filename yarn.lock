@@ -2186,6 +2186,14 @@
   "resolved" "https://registry.npmmirror.com/boolbase/-/boolbase-1.0.0.tgz"
   "version" "1.0.0"
 
+"bpmn-js-color-picker@^0.4.0":
+  "integrity" "sha512-pBf66r/oR5NhqJQxzlQmCYTwpaSPgh2JW9p/0Q1Nc6rvvDcbN/VgDnNLB9dnW3wlus9OqVZY2jXYL74TDJrk4A=="
+  "resolved" "https://registry.npmjs.org/bpmn-js-color-picker/-/bpmn-js-color-picker-0.4.0.tgz"
+  "version" "0.4.0"
+  dependencies:
+    "min-dom" "^3.1.3"
+    "tiny-svg" "^2.2.2"
+
 "bpmn-js-properties-panel@1.1.0":
   "integrity" "sha512-BwlTRr3zWMCBuJOEot7UpvSE3J/dnTcwfKTeQ49aN87Skinr3Ah+mdagow3s1gV2rBZWq0g4jIuR8759QgvMnw=="
   "resolved" "https://registry.npmjs.org/bpmn-js-properties-panel/-/bpmn-js-properties-panel-1.1.0.tgz"
@@ -2202,7 +2210,7 @@
     "preact-markup" "^2.1.1"
     "semver-compare" "^1.0.0"
 
-"bpmn-js@^6.x || ^7.x || ^8.x || ^9.x", "bpmn-js@^9.2.2", "bpmn-js@8.x || 9.x", "bpmn-js@9.x":
+"bpmn-js@^6.x || ^7.x || ^8.x || ^9.x", "bpmn-js@^9.2.2", "bpmn-js@>= 5", "bpmn-js@8.x || 9.x", "bpmn-js@9.x":
   "integrity" "sha512-Zs0e3fKEKIrnfVt+r4hkcqSg2XyMdXwp6x4xM0TDfGlduxyQWQ8rrqsjvnL4UEg4K0noBPqDce2vRawOilwReg=="
   "resolved" "https://registry.npmjs.org/bpmn-js/-/bpmn-js-9.2.2.tgz"
   "version" "9.2.2"
@@ -3445,6 +3453,16 @@
   dependencies:
     "min-dash" "^3.5.2"
     "min-dom" "^3.1.3"
+
+"diagram-js-minimap@^2.1.1":
+  "integrity" "sha512-H+UM6qoIVgJAOJgm3kZ57zpPyTx41YtAQAs0c/rrRube25ljygA0PSO5x42CJNulJdgK0AEWdsnhefMzlxyKfQ=="
+  "resolved" "https://registry.npmjs.org/diagram-js-minimap/-/diagram-js-minimap-2.1.1.tgz"
+  "version" "2.1.1"
+  dependencies:
+    "css.escape" "^1.5.1"
+    "min-dash" "^3.5.2"
+    "min-dom" "^3.1.1"
+    "tiny-svg" "^2.2.2"
 
 "diagram-js@^0.x || ^1.x || ^2.x || ^3.x || ^4.x || ^5.x || ^6.x || ^7.x || ^8.x", "diagram-js@^5.x || ^6.x || ^7.x || ^8.x", "diagram-js@^8.1.2", "diagram-js@^8.5.0", "diagram-js@7.x || 8.x":
   "integrity" "sha512-UHA/Zfs7kG22M9wXAifAyPb2OZ4lG4lFi0CZ0GC6/lXmOsSHwHVZ1s/h9UqaIXnzIKW8SnZoP3Rwqel1ZhZLzg=="
@@ -5918,7 +5936,7 @@
   "resolved" "https://registry.npmjs.org/min-dash/-/min-dash-3.8.1.tgz"
   "version" "3.8.1"
 
-"min-dom@^3.1.3", "min-dom@^3.2.0":
+"min-dom@^3.1.1", "min-dom@^3.1.3", "min-dom@^3.2.0":
   "integrity" "sha512-v6YCmnDzxk4rRJntWTUiwggLupPw/8ZSRqUq0PDaBwVZEO/wYzCH4SKVBV+KkEvf3u0XaWHly5JEosPtqRATZA=="
   "resolved" "https://registry.npmjs.org/min-dom/-/min-dom-3.2.1.tgz"
   "version" "3.2.1"

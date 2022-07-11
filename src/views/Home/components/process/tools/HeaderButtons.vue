@@ -151,15 +151,15 @@
                    icon="el-icon-refresh-right"
                    @click="processRedo()"/>
       </el-tooltip>
-      <el-tooltip effect="light"
-                  content="保存">
-        <el-button :size="size"
-                   icon="el-icon-refresh-left"
-                   @click="saveProcess()"/>
+      <el-tooltip effect="light" content="重新绘制">
+        <el-button :size="size" icon="el-icon-refresh" @click="$emit('newXml',bpmn)"/>
       </el-tooltip>
-      <!--      <el-tooltip effect="light" content="重新绘制">-->
-      <!--        <el-button :size="size" icon="el-icon-refresh" @click="processRestart"/>-->
-      <!--      </el-tooltip>-->
+    </el-button-group>
+    <el-button-group>
+      <el-button :size="size"
+                 :type="type"
+                 @click="saveProcess()">保存
+      </el-button>
     </el-button-group>
   </div>
 </template>
