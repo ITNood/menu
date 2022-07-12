@@ -41,7 +41,7 @@ export default {
       ],
       page: 1,
       pageSize: 10,
-      total: 0,
+      total: 100,
       multipleSelection: [],
       title: '',
       dataForm: {
@@ -91,10 +91,11 @@ export default {
       console.log(row);
       this.$refs.child.open();
       this.title = '修改';
-      this.dataForm.number = row.number;
-      this.dataForm.name = row.name;
-      this.dataForm.code = row.code;
-      this.dataForm.remarks = row.remarks;
+      this.dataForm = row;
+      // this.dataForm.number = row.number;
+      // this.dataForm.name = row.name;
+      // this.dataForm.code = row.code;
+      // this.dataForm.remarks = row.remarks;
     },
     //当前数据条数
     pageSizeChange(val) {
