@@ -91,11 +91,10 @@ export default {
       console.log(row);
       this.$refs.child.open();
       this.title = '修改';
-      this.dataForm = row;
-      // this.dataForm.number = row.number;
-      // this.dataForm.name = row.name;
-      // this.dataForm.code = row.code;
-      // this.dataForm.remarks = row.remarks;
+      this.dataForm.number = row.number;
+      this.dataForm.name = row.name;
+      this.dataForm.code = row.code;
+      this.dataForm.remarks = row.remarks;
     },
     //当前数据条数
     pageSizeChange(val) {
