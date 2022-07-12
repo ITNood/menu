@@ -73,7 +73,7 @@ export default {
     open() {
       this.show = !this.show;
       this.$nextTick(() => {
-        this.$refs.dataForm.resetFields();
+        this.$refs.dataForm.clearValidate();
       });
     },
     validate(callback) {
