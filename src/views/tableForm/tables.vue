@@ -105,7 +105,17 @@ export default {
     selectChange(val) {
       this.multipleSelection = val;
     },
-    submit() {},
+    submit(form) {
+      console.log('---------------', form);
+      this.$refs.child.validate((valid) => {
+        if (valid) {
+          //验证通过
+          alert('submit');
+        } else {
+          return false;
+        }
+      });
+    },
   },
 };
 </script>

@@ -39,7 +39,7 @@
         class="dialog-footer">
         <el-button @click="show = false">取 消</el-button>
         <el-button type="primary"
-          @click="submit">确 定</el-button>
+          @click="submit('dataForm')">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -73,8 +73,14 @@ export default {
     open() {
       this.show = !this.show;
     },
-    submit() {
-      this.$emit('submit');
+    validate(callback) {
+      this.$refs.dataForm.validate((valid) => {
+        callback(valid);
+      });
+    },
+    submit(dataForm) {
+      console.log(dataForm);
+      this.$emit('submit', dataForm);
     },
   },
 };
