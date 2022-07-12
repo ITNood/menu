@@ -89,6 +89,7 @@ export default {
     //修改
     edit(row) {
       this.$refs.child.open();
+      // this.$refs.child.$refs.dataForm.clearValidate();
       this.title = '修改';
       this.dataForm = row;
       console.log(row);
@@ -105,12 +106,12 @@ export default {
     selectChange(val) {
       this.multipleSelection = val;
     },
-    submit(form) {
-      console.log('---------------', form);
+    submit() {
       this.$refs.child.validate((valid) => {
         if (valid) {
           //验证通过
-          alert('submit');
+          console.log('submit');
+          this.$refs.child.open();
         } else {
           return false;
         }

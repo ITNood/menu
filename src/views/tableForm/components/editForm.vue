@@ -4,7 +4,6 @@
       :visible.sync="show"
       :close-on-click-modal="false"
       width="40%">
-
       <el-form :model="dataForm"
         ref="dataForm"
         label-width="100px">
@@ -65,6 +64,7 @@ export default {
   data() {
     return {
       show: false,
+      showbtn: false,
     };
   },
   created() {},
@@ -72,6 +72,9 @@ export default {
   methods: {
     open() {
       this.show = !this.show;
+      this.$nextTick(() => {
+        this.$refs.dataForm.resetFields();
+      });
     },
     validate(callback) {
       this.$refs.dataForm.validate((valid) => {
@@ -79,7 +82,6 @@ export default {
       });
     },
     submit(dataForm) {
-      console.log(dataForm);
       this.$emit('submit', dataForm);
     },
   },
