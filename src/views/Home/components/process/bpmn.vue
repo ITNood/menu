@@ -4,7 +4,7 @@
                     :processType="''+selectType.id"
                     :min-zoom="0.1" :max-zoom="4" @newXml="importXML"/>
     <div class="containers" ref="containers">
-      <div class="canvas" :ref="bpmnProp.container" id="canvas"></div>
+      <div class="canvas" :ref="bpmnProp.container" id="canvas" tabIndex="-1"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
       <right-menu @toggleFlow="reSelectChildren" :panel-types="selectType" :elements="selectElements"
                   :bpmn="bpmnProp.bpmn"
@@ -129,14 +129,13 @@ export default {
     init(xml, conf, id) {
       let props = this.bpmnProp;
       let that = this;
-
+      let container = that.$refs[props.container]
       if (props.bpmn) {
         props.bpmn.destroy();
       }
-      console.log(this)
       props.bpmn = new BpmnModeler({
-        container: that.$refs[props.container],
-        keyboard: props.keyboard ?? {bindTo: document},
+        container: container,
+        keyboard: props.keyboard ?? {bindTo: container},
         additionalModules: [
           BpmnColorPickerModule,
           PrefabricationTranslateModule,
@@ -168,15 +167,17 @@ export default {
       }
       if (xml) {
         await bpmn.importXML(xml).then(() => {
-          bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {id: id, isExecutable: true,
-            name: 'New'+ id,});
+          bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {
+            id: id, isExecutable: true,
+            name: 'New' + id,
+          });
         });
       } else {
         if (bpmn.createDiagram) {
           await bpmn.createDiagram().then(() => {
             bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {
               id: id,
-              name: 'New'+ id,
+              name: 'New' + id,
               isExecutable: true
             });
           });
@@ -211,7 +212,6 @@ export default {
         this.selectElements = event.newSelection.length
             ? event.newSelection
             : this.bpmnProp.modules.canvas.getRootElements();
-        console.log(this.selectElements)
       });
 
       props.modules.eventBus.on('connection.changed', ({element}) => {
@@ -346,23 +346,31 @@ export default {
      */
     synchronousCondition(first, second) {
       if (first && second) {
-        let firstName = first.businessObject.name;
-        let secondName = second.businessObject.name;
-        if ((firstName ? (firstName == 'true' ? 'false' : 'true') : null) != secondName) {
-          if (firstName) {
+        let firstName = first.businessObject.get('option');
+        let secondName = second.businessObject.get('option');
+        if ((!secondName) !== firstName) {
+          if (firstName === true || firstName === false) {
             this.bpmnProp.modules.modeling.updateProperties(second, {
-              name: firstName == 'true' ? 'false' : 'true',
+              name: !firstName + '',
+              option: !firstName,
             });
           } else if (secondName) {
             this.bpmnProp.modules.modeling.updateProperties(first, {
-              name: secondName == 'true' ? 'false' : 'true',
+              name: !second + '',
+              option: !second,
             });
           }
         }
-      } else if (!first.businessObject.name) {
-        this.bpmnProp.modules.modeling.updateProperties(first, {
-          name: 'true',
-        });
+      } else {
+        if (!first.businessObject.name) {
+          this.bpmnProp.modules.modeling.updateProperties(first, {
+            name: 'true',
+            option: true,
+          });
+          this.bpmnProp.modules.modeling.updateProperties((first || second).source,{
+            default: (first || second)
+          })
+        }
       }
     },
 
@@ -451,7 +459,7 @@ export default {
      * @param type
      */
     changeField(element, type) {
-      if(element.type === 'bpmn:Process'){
+      if (element.type === 'bpmn:Process') {
         return;
       }
       let isImperfect = false;
@@ -485,6 +493,7 @@ export default {
   position: relative;
 
   .canvas {
+    outline: none;
     background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+') repeat !important;
     height: 100%;
   }

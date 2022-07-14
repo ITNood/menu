@@ -8,12 +8,11 @@
                id="previewXml"
                append-to-body
                destroy-on-close>
-      <highlightjs autodetect
+      <highlightjs autodetect tabIndex="-1"
                    :language="previewType"
                    :code="previewResult"
                    style="height: 60vh"/>
     </el-dialog>
-    <!--    @change="importLocalFile"-->
     <el-button-group key="file-control">
       <!--          <el-button :size="size" :type="headerButtonType" icon="el-icon-edit-outline" @click="onSave">保存流程</el-button>-->
       <el-button :size="size"
@@ -167,7 +166,7 @@
 <script>
 import convert from 'xml-js';
 import 'highlight.js/styles/googlecode.css';
-import {save} from '@/api/process/index';
+import {save, sendJson} from '@/api/process/index';
 
 export default {
   name: 'HeaderButtons',
@@ -361,6 +360,18 @@ export default {
         this.previewModelVisible = true;
       });
     },
+    sendProcessJson() {
+      this.bpmn.saveXML({format: true}).then(({xml}) => {
+        let previewResult = convert.xml2json(xml, {spaces: 2});
+        sendJson(previewResult).then((res) => {
+          if (res.data) {
+            ;
+          } else {
+            this.$message.error('未获取到流程详细信息，请稍后重试');
+          }
+        });
+      });
+    },
     saveProcess() {
       this.bpmn.saveXML().then(({xml}) => {
         let process = this.bpmn.get('canvas').getRootElements()[0]
@@ -371,7 +382,7 @@ export default {
           xml
         }
         save(data).then((response) => {
-          console.log(response)
+          this.sendProcessJson()
         })
       });
     },

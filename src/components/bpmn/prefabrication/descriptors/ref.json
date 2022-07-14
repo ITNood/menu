@@ -23,6 +23,18 @@
           "type": "String"
         }
       ]
+    },{
+      "name": "OnlyTwoLineSequenceFlow",
+      "extends": [
+        "bpmn:SequenceFlow"
+      ],
+      "properties": [
+        {
+          "name": "option",
+          "isAttr": true,
+          "type": "Boolean"
+        }
+      ]
     }
   ],
   "enumerations": [

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-select @change="langChange" v-model="nowLang" placeholder="请选择语言">
+    <el-select @change="langChange" v-model="nowLang" placeholder="请选择语言" size="mini">
       <el-option v-for="item in options"
                  :key="item.value"
                  :label="item.label"
@@ -34,5 +34,7 @@ export default {
 </script>
 
 <style scoped>
-
+.el-select{
+  width: 60%;
+}
 </style>

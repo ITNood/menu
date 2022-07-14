@@ -114,14 +114,37 @@ a {
   cursor     : pointer;
 }
 
-.el-dropdown {
+//.el-dropdown {
+//  width          : 100%;
+//  display        : flex;
+//  align-items    : center;
+//  justify-content: flex-end;
+//  padding        : 10px 0;
+//  border-bottom  : 1px solid @titleBgk;
+//}
+
+#firstLine {
   width          : 100%;
   display        : flex;
   align-items    : center;
   justify-content: flex-end;
   padding        : 10px 0;
   border-bottom  : 1px solid @titleBgk;
+  .el-dropdown {
+    width          : auto;
+    display        : flex;
+    align-items    : center;
+    justify-content: flex-end;
+    margin-left: 20px;
+  }
+  #languageChanger {
+    width          : auto;
+    display        : flex;
+    align-items    : center;
+    justify-content: flex-end;
+  }
 }
+
 
 .el-footer {
   border-top     : 1px solid #e6e6e6;

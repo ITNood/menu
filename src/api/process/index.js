@@ -8,3 +8,8 @@ export function save(data) {
 export function list(query) {
   return api.get("/server/workflow/definition/list", query)
 }
+
+// 提交Json流程信息进行验证
+export function sendJson(data) {
+  return api.post('/server/workflow/definition/sendJson',data)
+}

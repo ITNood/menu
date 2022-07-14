@@ -4,6 +4,7 @@
                  :key="item.key" :name="item.key" :label="item.title" >
       <bpmn @createNewBpmn="createNewBpmn" :ref="'bpmn'+item.key" @cleanCreate="handleTabsRemove(item.key)"/>
     </el-tab-pane>
+
   </el-tabs>
 </template>
 
@@ -21,7 +22,7 @@ export default {
         }
       ],
       tabIndex: '1',
-      tabIndexHistory: ['1', '1'],
+      tabIndexHistory: [null, '1'],
       tabMaxIndex: 1,
     };
   },
@@ -43,7 +44,6 @@ export default {
       })
     },
     handleClick({name},) {
-      console.log(name, name != this.tabIndexHistory[1])
       if (name != this.tabIndexHistory[1]) {
         this.tabIndexHistory[0] = this.tabIndexHistory[1]
         this.tabIndexHistory[1] = name
@@ -65,12 +65,17 @@ export default {
       let removeIndex = null;
       tabs.forEach((tab, index) => {
         if (tab.key === selectKey) {
-          removeIndex = index;
           if (activeAreRemove) {
-            let nextTab = this.tabIndexHistory[0] ?? (tabs[index + 1] || tabs[index - 1]);
-            if (nextTab) {
-              this.tabIndex = nextTab.key;
+            let nextTab = this.tabIndexHistory[0]
+            if(selectKey == nextTab){
+              nextTab = (tabs[index + 1] || tabs[index - 1]).key
             }
+            if (nextTab) {
+              this.tabIndex = nextTab;
+              removeIndex = index;
+            }
+          }else{
+            removeIndex = index;
           }
         }
       });

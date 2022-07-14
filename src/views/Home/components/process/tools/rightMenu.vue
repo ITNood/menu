@@ -1,14 +1,12 @@
 <template>
   <div id="collapseList">
     <div v-if="thisElements.length > 0">
-
-      <el-row>
-        <el-col :span="8">
-          <!--          <div style="width: 46px;height: 46px;line-height: 46px;font-size:30px" class="bpmn-icon-start-event-none"/>-->         </el-col>
-        <el-col :span="16"><label> {{ this.$t('bpmn["' + this.businessObject.$descriptor.ns.localName + '"]') }}</label>
-        </el-col>
-      </el-row>
-      <el-form :model="basicsForm" ref="basicsForm" label-width="100px">
+      <!-- 标准描述 -->
+      <div id="preview">
+        <div style="width: 46px;height: 46px;line-height: 46px;font-size:30px" class="bpmn-icon-start-event-none"/>
+        <label> {{ translations( this.businessObject.$descriptor.ns.localName) }}</label>
+      </div>
+      <el-form label-width="100px">
         <el-collapse v-model="activeNames" @change="handleChange">
           <el-collapse-item title="基础信息" name="0">
             <el-form-item label="ID：" prop="id">
@@ -31,23 +29,23 @@
             </el-form-item>
           </el-collapse-item>
 
-          <el-collapse-item title="SUB FLOW" name="1">
-            <el-form :model="form" ref="form" label-width="55px">
-              <el-form-item label="名称：" prop="name">
-                <el-input size="mini" v-model="form.name"></el-input>
-              </el-form-item>
-            </el-form>
-            <el-table :data="subData" border id="tableForm" @selection-change="selectionChange" ref="tables"
-                      style="margin-top:15px">
-              <el-table-column type="selection" width="50px"></el-table-column>
-              <el-table-column prop="name" label="流程名称">
-                <template slot-scope="scope"><a @click="openFlow">{{ scope.row.name }}</a></template>
-              </el-table-column>
-            </el-table>
-            <el-button size="mini" type="primary" class="confirm">确认</el-button>
-          </el-collapse-item>
+<!--          <el-collapse-item title="SUB FLOW" name="1">-->
+<!--            <el-form :model="form" ref="form" label-width="55px">-->
+<!--              <el-form-item label="名称：" prop="name">-->
+<!--                <el-input size="mini" v-model="form.name"></el-input>-->
+<!--              </el-form-item>-->
+<!--            </el-form>-->
+<!--            <el-table :data="subData" border id="tableForm" @selection-change="selectionChange" ref="tables"-->
+<!--                      style="margin-top:15px">-->
+<!--              <el-table-column type="selection" width="50px"></el-table-column>-->
+<!--              <el-table-column prop="name" label="流程名称">-->
+<!--                <template slot-scope="scope"><a @click="openFlow">{{ scope.row.name }}</a></template>-->
+<!--              </el-table-column>-->
+<!--            </el-table>-->
+<!--            <el-button size="mini" type="primary" class="confirm">确认</el-button>-->
+<!--          </el-collapse-item>-->
 
-          <el-collapse-item title="流转信息" name="a">
+          <el-collapse-item title="流转信息" name="a" v-if="is(businessObject,'bpmn:Gateway') || is(businessObject.sourceRef,'bpmn:Gateway')" >
             <div v-if="is(businessObject,'bpmn:Gateway')">
               <el-form-item label="数据：">
                 <el-select :value="gatewayCondition[1]" size="mini"
@@ -69,13 +67,19 @@
                 <el-input-number :value="gatewayCondition[3]" size="mini"
                                  v-on:change="(a)=>onChangeField(gatewayCondition[1] + gatewayCondition[2] + a,['name'])"></el-input-number>
               </el-form-item>
+              <el-form-item label="默认流转：" prop="default">
+                <el-select :value="businessObject.get('default')" size="mini"
+                                 v-on:change="(a)=>onChangeField(a,['default'])">
+                  <el-option v-for="(item,index) in businessObject.get('outgoing')" :key="index" :value="item" :label="item.name"/>
+                </el-select>
+              </el-form-item>
               <!--              <el-button icon="el-icon-delete" type="danger" round size="mini" v-if="businessObject.outgoing">对换条件</el-button>-->
             </div>
             <div v-if="is(businessObject.sourceRef,'bpmn:Gateway')">
               <el-form-item label="数据：">
-                <el-select :value="businessObject.name" size="mini" v-on:input="(a)=>onChangeField(a ,['name'])">
-                  <el-option :key="true" value="true" :label="$t('condition.pass')"></el-option>
-                  <el-option :key="false" value="false" :label="$t('condition.fail')"></el-option>
+                <el-select :value="businessObject.option" size="mini" v-on:input="(a)=>onChangeField(a ,['option','name'])">
+                  <el-option :key="true" :value="true" :label="$t('condition.pass')"></el-option>
+                  <el-option :key="false" :value="false" :label="$t('condition.fail')"></el-option>
                 </el-select>
               </el-form-item>
             </div>
@@ -105,8 +109,9 @@
             </el-form-item>
             <el-row :gutter="20">
               <el-col :span="12">
-                <el-button :icon="businessObject.get('refId')?'el-icon-refresh-right':'el-icon-plus'" type="success" round size="mini" @click="toggleFlow">
-                  {{businessObject.get('refId')?'切换流程':'选择流程'}}
+                <el-button :icon="businessObject.get('refId')?'el-icon-refresh-right':'el-icon-plus'" type="success"
+                           round size="mini" @click="toggleFlow">
+                  {{ businessObject.get('refId') ? '切换流程' : '选择流程' }}
                 </el-button>
               </el-col>
               <el-col :span="12">
@@ -117,20 +122,14 @@
             </el-row>
           </el-collapse-item>
         </el-collapse>
-      </el-form>       <!----查看流程---->
-      <el-dialog title="提示" :visible.sync="isshow" width="50%">
-        <span>这是一段信息</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="isshow = false">取 消</el-button>
-          <el-button type="primary" @click="isshow = false">确 定</el-button>
-        </span>
-      </el-dialog>
+      </el-form>
     </div>
   </div>
 </template>
 
 <script>
 import {is as modelIs} from 'bpmn-js/lib/util/ModelUtil';
+import {translations as t} from "@/components/bpmn/prefabrication/translate/PrefabricationTranslate";
 
 export default {
   name: 'rightMenu',
@@ -150,6 +149,7 @@ export default {
       popupMenu: {},
       gatewayCondition: [],
 
+
       activeNames: ['0'],
       form: {
         name: '',
@@ -157,7 +157,6 @@ export default {
       subData: [{name: '111'}, {name: '2222'}, {name: '3333'}],
       selectedRow: [],
       disabled: true,
-      isshow: false,
       decisionForm: {
         name: '',
         condition: '',
@@ -188,6 +187,7 @@ export default {
     },
   },
   methods: {
+    translations: t,
     is: modelIs,
     flushElements(newValue) {
       // 强制刷新引用来使vue自动随最新数据变更
@@ -208,9 +208,11 @@ export default {
     // 字段更新
     onChangeField(event, type) {
       let properties = {};
-      type.forEach((i) => (properties[type] = event));
-      this.bpmn
-          .get('modeling')
+      type.forEach((i) => (properties[i] = event));
+      if(properties['name']){
+        properties['name'] = properties['name']+''
+      }
+      this.bpmn.get('modeling')
           .updateProperties(this.thisElements[this.selectIndex], properties);
       this.$emit('changeField', this.thisElements[this.selectIndex]);
       this.flushElements(this.elements);
@@ -218,7 +220,6 @@ export default {
 
     //折叠
     handleChange(val) {
-      ;
     },
     //单选
     selectionChange(row) {
@@ -227,10 +228,6 @@ export default {
         this.$refs.tables.clearSelection();
         this.$refs.tables.toggleRowSelection(row.pop());
       }
-    },
-    //查看流程
-    openFlow() {
-      this.isshow = !this.isshow;
     },
     //添加
     addRules() {
@@ -249,11 +246,19 @@ export default {
     },
     //切换
     toggleFlow() {
-      this.$emit('toggleFlow',this.selectIndex);
+      this.$emit('toggleFlow', this.selectIndex);
     },
   },
 };
 </script>
 
 <style scoped lang="less">
+#preview {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px 0px;
+  border-bottom: 1px solid wheat;
+}
 </style>
