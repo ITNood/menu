@@ -35,6 +35,18 @@
           "type": "Boolean"
         }
       ]
+    },{
+      "name": "ProcessExtends",
+      "extends": [
+        "bpmn:Process"
+      ],
+      "properties": [
+        {
+          "name": "option",
+          "isAttr": true,
+          "type": "Boolean"
+        }
+      ]
     }
   ],
   "enumerations": [

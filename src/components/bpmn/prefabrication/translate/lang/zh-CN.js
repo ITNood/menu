@@ -25,6 +25,8 @@ exports.default = {
             "^(.+?)\\s*/\\s*(.+)": "{$1}/{$2}",
         }
     },
+    Public: '公开的',
+    Private: '私有的',
     Process: "流程图",
     Start: "开始",
     End: "结束",

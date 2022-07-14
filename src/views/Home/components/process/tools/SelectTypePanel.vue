@@ -29,14 +29,14 @@
                 <el-row :gutter="20"
                         type="flex"
                         justify="space-around">
-                  <el-col v-if="element.preview"
+                  <el-col v-if="element.previewDiagram"
                           :span="10">
-                    <el-image :src="element.preview"
+                    <el-image :src="element.previewDiagram"
                               fit="cover"
                               style="max-width: 100px"/>
                   </el-col>
                   <!--                  <el-col :span="1"></el-col>-->
-                  <el-col :span="element.preview?14:24">
+                  <el-col :span="element.previewDiagram?14:24">
                     <el-row style="text-align: center;margin-bottom: 10px;">
                       <span>{{ element.moduleName }}</span>
                     </el-row>
@@ -60,44 +60,66 @@
             </el-col>
           </el-row>
         </el-col>
-        <el-col :span="4"
+        <el-col :span="4" style="border-left: rgba(222,222,222,0.8) 1px solid; padding-left: 20px"
                 v-if="Object.keys(planType).length">
-          <el-col>
-            <el-form>
-              <el-form-item label="已选中：">{{ planType.moduleName ? (planType.moduleName) : '' }}</el-form-item>
-              <el-form-item label="描述内容：">{{ planType.description ? (planType.description) : '' }}</el-form-item>
-            </el-form>
-          </el-col>
-          <el-col>
-            <el-button type="text"
-                       icon="el-icon-plus"
-                       @click="onSelect(null,null)">创建一个新的流程 (新创建)
-            </el-button>
-          </el-col>
-          <el-col>
-            <el-button type="text"
-                       icon="el-icon-star-on"
-                       @click="()=>{this.selectionCanSaveId=false;selectTemplate()}">依据模板创建新流程 (新创建)
-            </el-button>
-          </el-col>
-          <el-col>
-            <el-button type="text"
-                       icon="el-icon-search"
-                       @click="()=>{this.selectionCanSaveId=false;selectHistory()}">依据历史流程创建新流程 (新创建)
-            </el-button>
-          </el-col>
-          <el-col v-if="canRef">
-            <el-button type="text"
-                       icon="el-icon-link"
-                       @click="()=>{this.selectionCanSaveId=true;selectTemplate()}">引用模板 (引用)
-            </el-button>
-          </el-col>
-          <el-col v-if="canRef">
-            <el-button type="text"
-                       icon="el-icon-link"
-                       @click="()=>{this.selectionCanSaveId=true;selectHistory()}">引用历史记录 (引用)
-            </el-button>
-          </el-col>
+          <div style="width: 100%;padding: 10px 10px 10px 0px; border-bottom: rgba(222,222,222,0.8) 1px solid;">
+            <el-row style="padding-bottom: 10px" :gutter="3">
+              <el-col :span="6" style="text-align: center">
+                <el-row :gutter="1" type="flex" justify="space-around">
+                  <el-col :span="4">模</el-col>
+                  <el-col :span="4">块</el-col>
+                  <el-col :span="4">名</el-col>
+                  <el-col :span="4">称</el-col>
+                  <el-col :span="4">:</el-col>
+                </el-row>
+              </el-col>
+              <el-col :span="15">{{ planType.moduleName ? (planType.moduleName) : '' }}</el-col>
+            </el-row>
+            <el-row :gutter="3">
+              <el-col :span="6" style="text-align: center">
+                <el-row :gutter="1" type="flex" justify="space-around">
+                  <el-col :span="4">描</el-col>
+                  <el-col :span="4">述</el-col>
+                  <el-col :span="4">内</el-col>
+                  <el-col :span="4">容</el-col>
+                  <el-col :span="4">:</el-col>
+                </el-row>
+              </el-col>
+              <el-col :span="15">{{ planType.description ? (planType.description) : '' }}</el-col>
+            </el-row>
+          </div>
+          <div>
+            <el-col>
+              <el-button type="text"
+                         icon="el-icon-plus"
+                         @click="onSelect(null,null)">创建一个新的流程 (新创建)
+              </el-button>
+            </el-col>
+            <el-col>
+              <el-button type="text"
+                         icon="el-icon-star-on"
+                         @click="()=>{this.selectionCanSaveId=false;selectTemplate()}">依据模板创建新流程 (新创建)
+              </el-button>
+            </el-col>
+            <el-col>
+              <el-button type="text"
+                         icon="el-icon-search"
+                         @click="()=>{this.selectionCanSaveId=false;selectHistory()}">依据历史流程创建新流程 (新创建)
+              </el-button>
+            </el-col>
+            <el-col v-if="canRef">
+              <el-button type="text"
+                         icon="el-icon-link"
+                         @click="()=>{this.selectionCanSaveId=true;selectTemplate()}">引用模板 (引用)
+              </el-button>
+            </el-col>
+            <el-col v-if="canRef">
+              <el-button type="text"
+                         icon="el-icon-link"
+                         @click="()=>{this.selectionCanSaveId=true;selectHistory()}">引用历史记录 (引用)
+              </el-button>
+            </el-col>
+          </div>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -172,7 +194,7 @@ export default {
       this.choiceTypeClick(this.types[0]);
     },
     choiceTypeClick(element) {
-      if (element.status && element.status === 'Active') {
+      if (element && element.status && element.status === 'Active') {
         this.breadcrumb.push(element.moduleName);
         this.selectTypes = element || {};
       }
@@ -212,7 +234,7 @@ export default {
               title: item.moduleName,
               className: 'customer-element',
               icoImageUrl: item.icon,
-              shapeImageUrl: item.preview,
+              shapeImageUrl: item.previewDiagram,
               index: item.id,
             };
           });

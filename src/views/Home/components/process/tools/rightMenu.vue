@@ -20,7 +20,14 @@
             <el-form-item label="名称：" prop="name">
               <el-input :value="businessObject.get('name')" size="mini" v-on:input="(a)=>onChangeField(a,['name'])"/>
             </el-form-item>
-            <el-form-item label="组件模式：" prop="type">
+            <el-form-item label="流程类型：" prop="type" v-if="is(businessObject,'bpmn:Process')">
+              <el-select :value="businessObject.get('processType')" v-on:change="(a)=>onChangeField(a,['processType'])" placeholder="选择要更换的模式" size="mini">
+                <el-option value="None" :label="translations('None')"></el-option>
+                <el-option value="Public" :label="translations('Public')"></el-option>
+                <el-option value="Private" :label="translations('Private')"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="组件模式：" prop="type" v-else>
               <el-select value="" v-on:change="(item)=>item.action()" placeholder="选择要更换的模式" size="mini">
                 <el-option :key="index" :value="item" v-for="(item,index) in popupMenu">
                   <span :class="item.className"> {{ item.label }}</span>
@@ -49,13 +56,13 @@
             <div v-if="is(businessObject,'bpmn:Gateway')">
               <el-form-item label="数据：">
                 <el-select :value="gatewayCondition[1]" size="mini"
-                           v-on:input="(a)=>onChangeField(a + gatewayCondition[2] + gatewayCondition[3],['name'])">
+                           v-on:change="(a)=>onChangeField(a + gatewayCondition[2] + gatewayCondition[3],['name'])">
                   <el-option v-for="item in items" :key="item" :value="item.value"></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item label="条件：" prop="condition">
                 <el-select :value="gatewayCondition[2]" size="mini"
-                           v-on:input="(a)=>onChangeField(gatewayCondition[1] + a + gatewayCondition[3],['name'])">
+                           v-on:change="(a)=>onChangeField(gatewayCondition[1] + a + gatewayCondition[3],['name'])">
                   <el-option value=">" label="大于"></el-option>
                   <el-option value="<" label="小于"></el-option>
                   <el-option value=">=" label="大于等于"></el-option>
@@ -191,6 +198,7 @@ export default {
     is: modelIs,
     flushElements(newValue) {
       // 强制刷新引用来使vue自动随最新数据变更
+      this.thisElements = [];
       this.thisElements = newValue ?? [];
       if (newValue.length) {
         this.businessObject =

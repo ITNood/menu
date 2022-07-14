@@ -29,6 +29,10 @@ import HeaderButtons from './tools/HeaderButtons';
 import RightMenu from './tools/rightMenu.vue';
 import SelectTypePanel from './tools/SelectTypePanel';
 /**
+ * ToolsJs
+ */
+import {is as modelIs} from 'bpmn-js/lib/util/ModelUtil';
+/**
  * Bpmn And Bpmn Extend
  */
 import BpmnModeler from 'bpmn-js/lib/Modeler';
@@ -99,6 +103,7 @@ export default {
     this.$refs['typeSelect'].open();
   },
   methods: {
+    is: modelIs,
     typeSelect(selectType, xml, id) {
       if (this.protect) {
         if (!id) {
