@@ -22,7 +22,8 @@
               prop="code">
               <el-input placeholder="请输入验证码"
                 type="code"
-                v-model="loginForm.code"></el-input>
+                v-model="loginForm.code"
+                @keyup.enter.native="login"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8"><img :src="codeUrl"
@@ -31,8 +32,7 @@
         </el-row>
 
         <el-row>
-          <el-col :offset="
-              10">
+          <el-col :offset="10">
             <el-button :loading="loading"
               type="primary"
               @click="login"
