@@ -2,6 +2,7 @@
   <div>
     <el-pagination @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
+      :hide-on-single-page="true"
       :current-page="activePage"
       :page-sizes="[10, 20, 30, 40]"
       :page-size="pageSize"

@@ -34,14 +34,14 @@ export default {
         code: '',
       },
       data: [
-        { number: 5555, name: 'dadaf', code: 'ddd', remarks: '4dadfa1' },
-        { number: 33, name: 'tt', code: 'ss', remarks: '3233' },
-        { number: 44, name: 'uu', code: 'dd', remarks: '545' },
-        { number: 5588, name: 'ee', code: '454fff847', remarks: '777' },
+        { id: 1, number: 5555, name: 'dadaf', code: 'ddd', remarks: '4dadfa1' },
+        { id: 2, number: 33, name: 'tt', code: 'ss', remarks: '3233' },
+        { id: 3, number: 44, name: 'uu', code: 'dd', remarks: '545' },
+        { id: 4, number: 5588, name: 'ee', code: '454fff847', remarks: '777' },
       ],
       page: 1,
       pageSize: 10,
-      total: 100,
+      total: 50,
       multipleSelection: [],
       title: '',
       dataForm: {
@@ -49,18 +49,16 @@ export default {
         name: '',
         code: '',
         remarks: '',
+        id: '',
       },
     };
   },
   created() {},
   mounted() {},
   methods: {
-    search() {
-      console.log(this.form);
-    },
+    search() {},
     //删除
     del() {
-      console.log(this.multipleSelection);
       if (this.multipleSelection.length > 0) {
         this.$confirm('确定要删除选中的数据吗 ?', '提示', {
           confirmButtonText: '确定',
@@ -68,6 +66,11 @@ export default {
           type: 'warning',
         })
           .then(() => {
+            const ids = [];
+            this.multipleSelection.map((e) => {
+              ids.push(e.id);
+            });
+            console.log(ids);
             this.$message.success('删除成功');
           })
           .catch(() => {
@@ -95,6 +98,7 @@ export default {
       this.dataForm.name = row.name;
       this.dataForm.code = row.code;
       this.dataForm.remarks = row.remarks;
+      this.dataForm.id = row.id;
     },
     //当前数据条数
     pageSizeChange(val) {
@@ -112,7 +116,6 @@ export default {
       this.$refs.child.validate((valid) => {
         if (valid) {
           //验证通过
-          console.log('submit');
           this.$refs.child.open();
         } else {
           return false;

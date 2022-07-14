@@ -32,8 +32,7 @@
         </el-row>
 
         <el-row>
-          <el-col :offset="
-              10">
+          <el-col :offset="10">
             <el-button :loading="loading"
               type="primary"
               @click="login"

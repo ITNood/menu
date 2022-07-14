@@ -38,7 +38,7 @@
             size="mini"
             type="text">修改</el-button>
           <el-button icon="el-icon-delete"
-            @click="deldata(scope.$index,tableData)"
+            @click="deldata(scope.row,scope.$index,tableData)"
             size="mini"
             type="text">删除</el-button>
         </template>
@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 export default {
   name: 'TableForm',
   props: ['tableData', 'multipleSelection'],
@@ -67,7 +69,27 @@ export default {
       this.$emit('del');
     },
     //导出
-    exoprt() {},
+    exoprt() {
+      var xlsxParam = { raw: true }; //转换成excel时，使用原始的格式
+      var wb = XLSX.utils.table_to_book(
+        document.querySelector('#dataForm'),
+        xlsxParam
+      );
+      var wbout = XLSX.write(wb, {
+        bookType: 'xlsx',
+        bookSST: true,
+        type: 'array',
+      });
+      try {
+        FileSaver.saveAs(
+          new Blob([wbout], { type: 'application/octet-stream;charset=utf-8' }),
+          '数据.xlsx'
+        );
+      } catch (e) {
+        if (typeof console !== 'undefined') console.log(e, wbout);
+      }
+      return wbout;
+    },
     //选中
     handleSelectionChange(val) {
       this.$emit('selectChange', val);
@@ -76,13 +98,14 @@ export default {
     edit(row) {
       this.$emit('edit', row);
     },
-    deldata(index, rows) {
+    deldata(row, index, rows) {
       this.$confirm('确定要删除吗 ?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
       })
         .then(() => {
+          const id = row.id;
           rows.splice(index, 1);
           this.$message.success('删除成功');
         })
