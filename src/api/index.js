@@ -13,6 +13,10 @@ class api {
     //请求。页面中.then执行成功时的操作。
     return await http.put(url, params)
   }
+  async delete(url, params) {
+    //请求。页面中.then执行成功时的操作。
+    return await http.delete(url, params)
+  }
 
 }
 export default new api()

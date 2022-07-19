@@ -38,13 +38,25 @@
     },{
       "name": "ProcessExtends",
       "extends": [
+        "bpmn:Process","bpmn:Task"
+      ],
+      "properties": [
+        {
+          "name": "sharedProps",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },{
+      "name": "CustomProcessExtends",
+      "extends": [
         "bpmn:Process"
       ],
       "properties": [
         {
-          "name": "option",
+          "name": "customerSharedProps",
           "isAttr": true,
-          "type": "Boolean"
+          "type": "String"
         }
       ]
     }

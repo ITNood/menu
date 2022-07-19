@@ -2,7 +2,7 @@
   <div>
     <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn" :bpmn="bpmnProp.bpmn"
                     :processType="''+selectType.id"
-                    :min-zoom="0.1" :max-zoom="4" @newXml="importXML"/>
+                    :min-zoom="0.1" :max-zoom="4" @newXml="reInit"/>
     <div class="containers" ref="containers">
       <div class="canvas" :ref="bpmnProp.container" id="canvas" tabIndex="-1"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
@@ -44,6 +44,7 @@ import {
 } from '@/components/bpmn/prefabrication';
 import BpmnColorPickerModule from 'bpmn-js-color-picker';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
+import ResizeAllRules from "@/components/bpmn/prefabrication/resize-all-rules";
 
 export default {
   name: 'bpmn',
@@ -95,6 +96,9 @@ export default {
           canvas: null,
         },
       },
+      cache:{
+        xml:null, conf:null, id:null
+      },
     };
   },
   created() {
@@ -126,12 +130,26 @@ export default {
       this.typeSelect(selectType, xml, id);
     },
 
+    reInit(xml, conf, id){
+      if(!xml){
+        xml = this.cache.xml
+      }
+      if(!conf){
+        conf = this.cache.conf
+      }
+      if(!id){
+        id = this.cache.id
+      }
+      this.init(xml,conf,id);
+    },
     /**
      * 初始化Bpmn图
      * @param xml
      * @param conf
+     * @param id
      */
     init(xml, conf, id) {
+      this.cache ={xml,conf,id}
       let props = this.bpmnProp;
       let that = this;
       let container = that.$refs[props.container]
@@ -143,6 +161,7 @@ export default {
         keyboard: props.keyboard ?? {bindTo: container},
         additionalModules: [
           BpmnColorPickerModule,
+          ResizeAllRules,
           PrefabricationTranslateModule,
           PrefabricationPaletteModule,
           PrefabricationReaderModule,
@@ -249,7 +268,7 @@ export default {
                     '条件仅可使用“是”，“否”两个分支'
                 )
             );
-          } else if (target.type.includes('Gateway')) {
+          } else if (target=== source) {
             this.removeCollection(
                 element,
                 this.$createElement(
@@ -372,7 +391,7 @@ export default {
             name: 'true',
             option: true,
           });
-          this.bpmnProp.modules.modeling.updateProperties((first || second).source,{
+          this.bpmnProp.modules.modeling.updateProperties((first || second).source, {
             default: (first || second)
           })
         }
@@ -464,22 +483,22 @@ export default {
      * @param type
      */
     changeField(element, type) {
-      if (element.type === 'bpmn:Process') {
-        return;
-      }
-      let isImperfect = false;
-      let isUnSave = false;
-      let isUnCheck = true;
-      let isSuccess = true;
-      if (isImperfect) {
-        this.changeColor(this.elementColorEnum.imperfect, element);
-      } else if (isUnSave) {
-        this.changeColor(this.elementColorEnum.unSave, element);
-      } else if (isUnCheck) {
-        this.changeColor(this.elementColorEnum.unCheck, element);
-      } else if (isSuccess) {
-        this.changeColor(this.elementColorEnum.complete, element);
-      }
+      // if (element.type === 'bpmn:Process') {
+      //   return;
+      // }
+      // let isImperfect = false;
+      // let isUnSave = false;
+      // let isUnCheck = true;
+      // let isSuccess = true;
+      // if (isImperfect) {
+      //   this.changeColor(this.elementColorEnum.imperfect, element);
+      // } else if (isUnSave) {
+      //   this.changeColor(this.elementColorEnum.unSave, element);
+      // } else if (isUnCheck) {
+      //   this.changeColor(this.elementColorEnum.unCheck, element);
+      // } else if (isSuccess) {
+      //   this.changeColor(this.elementColorEnum.complete, element);
+      // }
     },
 
     reSelectChildren(index) {

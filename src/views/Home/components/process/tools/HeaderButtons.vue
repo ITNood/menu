@@ -231,7 +231,7 @@ export default {
       reader.readAsText(file);
       reader.onload = function () {
         let xmlStr = this.result;
-        that.$emit("newXml", that.bpmn, xmlStr);
+        that.$emit("newXml", xmlStr);
       };
     },
     // 下载流程图到本地
