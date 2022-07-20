@@ -57,6 +57,9 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row>
+
+        </el-row>
       </el-form>
       <span slot="footer"
             class="dialog-footer">
@@ -89,7 +92,10 @@ export default {
         icon: null,
         previewDiagram: '',
         description: '',
-        config: {},
+        config: {
+          PROPS:[],
+          PROCESS:[]
+        },
         childNode: null,
       }
     };

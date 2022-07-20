@@ -22,74 +22,74 @@
       <el-divider></el-divider>
       <el-row>
         <el-col :span="20">
-          <el-row v-if="selectTypes && selectTypes.status && selectTypes.status === 'Active'">
-            <div v-for="(element, index) in selectTypes.childNode"
-                 :key="element.id">
-              <el-col :span="6"
-                      v-if="element.status === 'Active'"
-                      :offset="index%4 > 0 ? 2 : 1">
-                <el-card :shadow="(planType.id === element.id)?'always':'hover'"
-                         style="margin-bottom: 20px"
-                         :style="(planType.id === element.id)?{border:'1px solid #0ff'}:{}">
-                  <el-row :gutter="1"
-                          type="flex"
-                          justify="space-around">
-                    <el-col v-if="element.previewDiagram"
-                            :span="9">
-                      <el-image :src="element.previewDiagram"
-                                fit="cover"
-                                style="max-width: 100px"/>
-                    </el-col>
-                    <el-col :span="element.previewDiagram?14:24">
-                      <el-row style="text-align: center;margin-bottom: 20px;">
-                        <span>{{ element.moduleName }}</span>
-                      </el-row>
-                      <el-row type="flex" justify="center" align="middle" :gutter="2">
-                        <el-col :span="11" v-if="get(element,'loading') || get(element,'childNode').length >0">
-                          <el-button v-on:click="choiceTypeClick(element)"
+          <el-row v-if="selectTypes && selectTypes.status && selectTypes.status === 'Active'" :gutter="20">
+            <el-col :span="4" v-for="(element) in selectTypes.childNode.filter(i=>i.status === 'Active')" :key="element.id">
+              <!--                :offset="index%4 > 0 ? 2 : 1"-->
+              <el-card :shadow="(planType.id === element.id)?'always':'hover'"
+                       style="margin-bottom: 20px"
+                       :style="(planType.id === element.id)?{border:'1px solid #0ff'}:{}">
+                <el-row :gutter="20"
+                        type="flex"
+                        justify="space-around">
+                  <el-col v-if="element.previewDiagram"
+                          :span="10">
+                    <el-image :src="element.previewDiagram"
+                              fit="cover"
+                              style="max-width: 100px"/>
+                  </el-col>
+                  <el-col :span="element.previewDiagram?14:24">
+                    <el-row style="text-align: center;margin-bottom: 20px;">
+                      <span>{{ element.moduleName }}</span>
+                    </el-row>
+                    <el-row type="flex" justify="center" align="middle" :gutter="20">
+                      <el-col :span="12" v-if="get(element,'loading') || get(element,'childNode').length >0">
+
+                        <div style="margin: auto">
+                          <el-button v-on:click="choiceTypeClick(element)" style="margin: auto"
                                      :loading="get(element,'loading')"
                                      size="mini">{{ get(element, 'loading') ? '' : '展开' }}
                           </el-button>
-                        </el-col>
-                          <el-col :span="11">
+                        </div>
+                      </el-col>
+                      <el-col :span="12">
+                        <div style="display: flex;width: 100%;justify-content: center">
                           <el-button size="mini"
                                      v-on:click="plannedTypeClick(element)">
                             {{ (planType.id === element.id) ? '已选定' : '选定' }}
-                          </el-button></el-col>
-                      </el-row>
-                    </el-col>
-                  </el-row>
-                </el-card>
-              </el-col>
-            </div>
+                          </el-button>
+                        </div>
+                      </el-col>
+                    </el-row>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-col>
           </el-row>
         </el-col>
         <el-col :span="4" style="border-left: rgba(222,222,222,0.8) 1px solid; padding-left: 20px"
                 v-if="Object.keys(planType).length">
           <div style="width: 100%;padding: 10px 10px 10px 0px; border-bottom: rgba(222,222,222,0.8) 1px solid;">
-            <el-row style="padding-bottom: 10px" :gutter="3">
-              <el-col :span="6" style="text-align: center">
-                <el-row :gutter="1" type="flex" justify="space-around">
-                  <el-col :span="4">模</el-col>
-                  <el-col :span="4">块</el-col>
-                  <el-col :span="4">名</el-col>
-                  <el-col :span="4">称</el-col>
-                  <el-col :span="4">:</el-col>
+            <el-row style="padding-bottom: 10px" :gutter="20">
+              <el-col :span="7" style="text-align: center">
+                <el-row :gutter="6" type="flex" justify="space-around">
+                  <el-col :span="6">模</el-col>
+                  <el-col :span="6">块</el-col>
+                  <el-col :span="6">名</el-col>
+                  <el-col :span="6">称 :</el-col>
                 </el-row>
               </el-col>
-              <el-col :span="15">{{ planType.moduleName ? (planType.moduleName) : '' }}</el-col>
+              <el-col :span="17">{{ planType.moduleName ? (planType.moduleName) : '' }}</el-col>
             </el-row>
-            <el-row :gutter="3">
-              <el-col :span="6" style="text-align: center">
-                <el-row :gutter="1" type="flex" justify="space-around">
-                  <el-col :span="4">描</el-col>
-                  <el-col :span="4">述</el-col>
-                  <el-col :span="4">内</el-col>
-                  <el-col :span="4">容</el-col>
-                  <el-col :span="4">:</el-col>
+            <el-row :gutter="20">
+              <el-col :span="7" style="text-align: center">
+                <el-row :gutter="6" type="flex" justify="space-around">
+                  <el-col :span="6">描</el-col>
+                  <el-col :span="6">述</el-col>
+                  <el-col :span="6">内</el-col>
+                  <el-col :span="6">容 :</el-col>
                 </el-row>
               </el-col>
-              <el-col :span="15">{{ planType.description ? (planType.description) : '' }}</el-col>
+              <el-col :span="17">{{ planType.description ? (planType.description) : '' }}</el-col>
             </el-row>
           </div>
           <div>

@@ -374,16 +374,16 @@ export default {
     },
     saveProcess() {
       this.bpmn.saveXML().then(({xml}) => {
-        let process = this.bpmn.get('canvas').getRootElements()[0]
-        let data = {
-          name: process.businessObject.get("name"),
-          category: this.processType,
-          processKey: process.id,
-          xml
-        }
-        save(data).then((response) => {
+        // let process = this.bpmn.get('canvas').getRootElements()[0]
+        // let data = {
+        //   name: process.businessObject.get("name"),
+        //   category: this.processType,
+        //   processKey: process.id,
+        //   xml
+        // }
+        // save(data).then((response) => {
           this.sendProcessJson()
-        })
+        // })
       });
     },
   },

@@ -8,7 +8,8 @@
       <div class="properties-panel-parent" id="js-properties-panel"></div>
       <right-menu @toggleFlow="reSelectChildren" :panel-types="selectType" :elements="selectElements"
                   :bpmn="bpmnProp.bpmn"
-                  @changeField="changeField"/>
+      />
+      <!--      @changeField="changeField"-->
     </div>
     <select-type-panel ref="typeSelect" @onSelect="typeSelect"
                        :default-visible="selectTypePanelDefaultVisible" :canRef="protect"
@@ -59,7 +60,7 @@ export default {
         },
         imperfect: {
           fill: null,
-          stroke: 'rgb(255,255,55)',
+          stroke: 'rgb(182,182,0)',
         },
         unCheck: {
           fill: null,
@@ -72,6 +73,10 @@ export default {
         error: {
           fill: 'rgb(255,0,0)',
           stroke: 'rgb(0,0,0)',
+        },
+        default: {
+          fill: null,
+          stroke: null,
         },
       },
 
@@ -96,8 +101,8 @@ export default {
           canvas: null,
         },
       },
-      cache:{
-        xml:null, conf:null, id:null
+      cache: {
+        xml: null, conf: null, id: null
       },
     };
   },
@@ -130,17 +135,17 @@ export default {
       this.typeSelect(selectType, xml, id);
     },
 
-    reInit(xml, conf, id){
-      if(!xml){
+    reInit(xml, conf, id) {
+      if (!xml) {
         xml = this.cache.xml
       }
-      if(!conf){
+      if (!conf) {
         conf = this.cache.conf
       }
-      if(!id){
+      if (!id) {
         id = this.cache.id
       }
-      this.init(xml,conf,id);
+      this.init(xml, conf, id);
     },
     /**
      * 初始化Bpmn图
@@ -149,7 +154,7 @@ export default {
      * @param id
      */
     init(xml, conf, id) {
-      this.cache ={xml,conf,id}
+      this.cache = {xml, conf, id}
       let props = this.bpmnProp;
       let that = this;
       let container = that.$refs[props.container]
@@ -226,10 +231,10 @@ export default {
 
       props.modules.eventBus.on("element.updateProperties", (element) => {
         // 数据更新后
-
         let newValue = this.selectElements;
         this.selectElements = [];
         this.selectElements = newValue;
+        this.changeField(element);
       });
 
       props.modules.eventBus.on('selection.changed', (event) => {
@@ -268,7 +273,7 @@ export default {
                     '条件仅可使用“是”，“否”两个分支'
                 )
             );
-          } else if (target=== source) {
+          } else if (target === source) {
             this.removeCollection(
                 element,
                 this.$createElement(
@@ -482,23 +487,31 @@ export default {
      * @param event
      * @param type
      */
-    changeField(element, type) {
-      // if (element.type === 'bpmn:Process') {
-      //   return;
-      // }
-      // let isImperfect = false;
-      // let isUnSave = false;
-      // let isUnCheck = true;
-      // let isSuccess = true;
-      // if (isImperfect) {
-      //   this.changeColor(this.elementColorEnum.imperfect, element);
-      // } else if (isUnSave) {
-      //   this.changeColor(this.elementColorEnum.unSave, element);
-      // } else if (isUnCheck) {
-      //   this.changeColor(this.elementColorEnum.unCheck, element);
-      // } else if (isSuccess) {
-      //   this.changeColor(this.elementColorEnum.complete, element);
-      // }
+    changeField(element) {
+      console.log('aaa')
+      if (element.type === 'bpmn:Process') {
+        return;
+      }
+
+      let isImperfect = false;
+      let isUnSave = false;
+      let isUnCheck = false;
+      let isSuccess = false;
+      // 完整性
+      if (!element.businessObject.get("name")) {
+        isImperfect = true;
+      }
+      if (isImperfect) {
+        this.changeColor(this.elementColorEnum.imperfect, element);
+      } else if (isUnSave) {
+        this.changeColor(this.elementColorEnum.unSave, element);
+      } else if (isUnCheck) {
+        this.changeColor(this.elementColorEnum.unCheck, element);
+      } else if (isSuccess) {
+        this.changeColor(this.elementColorEnum.complete, element);
+      } else {
+        this.changeColor(this.elementColorEnum.default, element);
+      }
     },
 
     reSelectChildren(index) {

@@ -1,22 +1,22 @@
 import api from '../'
 
 export function list(data) {
-    return api.get("/api/menu/finAllMenu", data)
+    return api.get("/server/menu/finAllMenu", data)
 }
 
 export function getMenu(parentId) {
-    return api.get("/api/menu/getMenu", {id: parentId})
+    return api.get("/server/menu/getMenu", {id: parentId})
 }
 
 
 export function insertMenu(data) {
-    return api.post("/api/menu/insertMenu", data)
+    return api.post("/server/menu/insertMenu", data)
 }
 
 export function updateMenu(data) {
-    return api.put("/api/menu/updateMenu", data)
+    return api.put("/server/menu/updateMenu", data)
 }
 
 export function deleteMenu(data) {
-    return api.delete("/api/menu/deleteMenu/" + data)
+    return api.delete("/server/menu/deleteMenu/" + data)
 }

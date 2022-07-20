@@ -160,7 +160,8 @@
                   </div>
                   <!-- 页面中自添加的数据 -->
                   <div v-for="(list,index) in customerSharedProps" :key="index" class="lists">
-                    <el-input v-model="customerSharedProps[index]" size="mini" style="width: 50%;margin-right: 20px" @input="()=>{onChangeField(customerSharedProps.join(','),['customerSharedProps'],root)}"></el-input>
+                    <el-input v-model="customerSharedProps[index]" size="mini" style="width: 50%;margin-right: 20px"
+                              @input="()=>{onChangeField(customerSharedProps.join(','),['customerSharedProps'],root)}"></el-input>
                     <el-checkbox :label="list" size="mini" style="margin-bottom:15px;"
                                  v-if="is(businessObject,'refBpmn:RefServiceTask')">共享
                     </el-checkbox>
@@ -168,7 +169,8 @@
                   </div>
                   <div style="margin-top: 10px">
                     <el-button icon="el-icon-plus" type="primary" size="mini"
-                               @click="()=>{customerSharedProps.push('newVal'+customerSharedProps.length);onChangeField(customerSharedProps.join(','),['customerSharedProps'],root)}">添加
+                               @click="()=>{customerSharedProps.push('newVal'+customerSharedProps.length);onChangeField(customerSharedProps.join(','),['customerSharedProps'],root)}">
+                      添加
                     </el-button>
                   </div>
                 </div>
@@ -176,7 +178,9 @@
             </el-row>
             <el-row :gutter="2">
               <el-col :span="12">
-                <el-button type="danger" round size="mini" @click="()=>onChangeField(null,['sharedProps','customerSharedProps'])" icon="el-icon-refresh">
+                <el-button type="danger" round size="mini"
+                           @click="()=>onChangeField(null,['sharedProps','customerSharedProps'])"
+                           icon="el-icon-refresh">
                   刷新配置
                 </el-button>
               </el-col>
@@ -284,15 +288,10 @@ export default {
     // 字段更新
     onChangeField(event, type, elements) {
       let properties = {};
-      type.forEach((i) => properties[i] = (i==='name'?(event+''):event));
-      console.log(properties)
-      this.bpmn.get('modeling')
-          .updateProperties(elements || this.thisElements[this.selectIndex], properties);
-      this.$emit('changeField', this.thisElements[this.selectIndex]);
+      type.forEach((i) => properties[i] = (i === 'name' ? (event + '') : event));
+      this.bpmn.get('modeling').updateProperties(elements || this.thisElements[this.selectIndex], properties);
+      // this.$emit('changeField', this.thisElements[this.selectIndex]);
       this.flushElements(this.elements);
-    },
-    sharedChange(newVal) {
-      console.log(newVal)
     },
     //折叠
     handleChange(val) {
@@ -325,7 +324,7 @@ export default {
       this.$emit('toggleFlow', this.selectIndex);
     },
     remove8SplitArray(removeItem) {
-      this.onChangeField( this.customerSharedProps.filter((v) => v !== removeItem).join(","),['customerSharedProps'],this.root)
+      this.onChangeField(this.customerSharedProps.filter((v) => v !== removeItem).join(","), ['customerSharedProps'], this.root)
     }
   },
 };
