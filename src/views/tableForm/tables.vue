@@ -91,7 +91,6 @@ export default {
     },
     //修改
     edit(row) {
-      console.log(row);
       this.$refs.child.open();
       this.title = '修改';
       this.dataForm.number = row.number;

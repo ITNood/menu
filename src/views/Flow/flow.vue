@@ -78,7 +78,7 @@ export default {
       caseNumber: '',
       lengthNumber: '',
       total: '',
-      show: true,
+      show: false,
       isshow: true,
       play: true,
       numberkpi: '',
