@@ -122,7 +122,7 @@ export default {
         },
         childNode: null,
       },
-      lists: [{ name: '' }],
+      lists: [],
     };
   },
   watch: {},
@@ -176,14 +176,14 @@ export default {
       this.lists.push({ name: '' });
     },
     delInput(index) {
-      if (this.lists.length > 1) {
-        const list = [...this.lists];
-        list.splice(index, 1);
-        this.lists = [...list];
-      } else {
-        this.$message.warning('给我留点，不能再删了！');
-        return;
-      }
+      // if (this.lists.length > 1) {
+      const list = [...this.lists];
+      list.splice(index, 1);
+      this.lists = [...list];
+      // } else {
+      //   this.$message.warning('给我留点，不能再删了！');
+      //   return;
+      // }
     },
   },
 };
