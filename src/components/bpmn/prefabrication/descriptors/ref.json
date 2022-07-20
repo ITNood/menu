@@ -14,11 +14,47 @@
           "name": "ref",
           "default": "",
           "isAttr": true,
-          "type": "String"
+          "type": "Integer"
         },
         {
           "name": "refId",
           "default": "",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },{
+      "name": "OnlyTwoLineSequenceFlow",
+      "extends": [
+        "bpmn:SequenceFlow"
+      ],
+      "properties": [
+        {
+          "name": "option",
+          "isAttr": true,
+          "type": "Boolean"
+        }
+      ]
+    },{
+      "name": "ProcessExtends",
+      "extends": [
+        "bpmn:Process","bpmn:Task"
+      ],
+      "properties": [
+        {
+          "name": "sharedProps",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },{
+      "name": "CustomProcessExtends",
+      "extends": [
+        "bpmn:Process"
+      ],
+      "properties": [
+        {
+          "name": "customerSharedProps",
           "isAttr": true,
           "type": "String"
         }

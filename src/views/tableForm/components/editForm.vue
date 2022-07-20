@@ -3,42 +3,94 @@
     <el-dialog :title="title"
       :visible.sync="show"
       :close-on-click-modal="false"
-      width="40%">
+      width="60%">
       <el-form :model="dataForm"
         ref="dataForm"
         label-width="100px">
-        <el-form-item prop="number"
-          label="分类编号:"
-          :rules="[{ required: true, message: '请输入分类编号', trigger: 'blur' }]">
-          <el-input v-model="dataForm.number"
-            placeholder="请输入分类编号"></el-input>
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item prop="moduleName"
+              label="模块名称:"
+              :rules="[{ required: true, message: '请输入模块名称', trigger: 'blur' }]">
+              <el-input v-model="dataForm.moduleName"
+                :disabled="canSelectType.indexOf(dataForm.status) < 0"
+                placeholder="请输入模块名称"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item prop="status"
+              label="分类名称:"
+              :rules="[{required:true,message:'请调整状态',trigger:'blur'}]">
+              <el-select v-model="dataForm.status"
+                :disabled="canSelectType.indexOf(dataForm.status) < 0"
+                placeholder="请调整状态">
+                <el-option :value="item"
+                  :key="item"
+                  :label="item"
+                  v-for="(item) in canSelectType" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="图标:"
+              :rules="[{required:true,message:'请调整状态',trigger:'blur'}]">
+              <el-upload :imit="1"
+                action="#"
+                list-type="picture-card"
+                :auto-upload="false"
+                accept=".svg"
+                :before-upload="beforeAvatarUpload"
+                :on-remove="handleRemove"
+                :on-change="changeFile"
+                :file-list="dataForm.icon? [{url:dataForm.icon}]:[]"
+                :limit="1"
+                :on-preview="handlePictureCardPreview">
+                <i class="el-icon-plus" />
+              </el-upload>
+              <el-dialog :visible.sync="dialogVisible"
+                append-to-body>
+                <img width="100%"
+                  :src="dialogImageUrl"
+                  alt="">
+              </el-dialog>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item prop="description"
+              label="描述:">
+              <el-input type="textarea"
+                v-model="dataForm.description"
+                style="min-height: 148px"
+                :autosize="{ minRows: 6}"
+                :disabled="canSelectType.indexOf(dataForm.status) < 0"
+                placeholder="请输入描述信息"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
 
-        <el-form-item prop="name"
-          label="分类名称:"
-          :rules="[{required:true,message:'请输入分类名称',trigger:'blur'}]">
-          <el-input v-model="dataForm.name"
-            placeholder="请输入分类名称"></el-input>
-        </el-form-item>
-
-        <el-form-item prop="code"
-          label="分类编码:"
-          :rules="[{required:true,message:'请输入分类编码',trigger:'blur'}]">
-          <el-input v-model="dataForm.code"
-            placeholder="请输入分类编码"></el-input>
-        </el-form-item>
-
-        <el-form-item prop="remarks"
-          label="备注:">
-          <el-input v-model="dataForm.remarks"
-            placeholder="请输入备注信息"></el-input>
-        </el-form-item>
       </el-form>
+      <div class="addlsit">
+        <div class="contentlist"
+          v-for="(e,index) in lists"
+          :key="index">
+          <el-input v-model="e.name"></el-input>
+          <i class="el-icon-circle-close"
+            @click="delInput(index)"></i>
+        </div>
+        <el-button icon="el-icon-plus"
+          style="margin-top:20px"
+          type="primary"
+          size="small"
+          @click="addInput">添加</el-button>
+      </div>
+
       <span slot="footer"
         class="dialog-footer">
         <el-button @click="show = false">取 消</el-button>
         <el-button type="primary"
-          @click="submit('dataForm')">确 定</el-button>
+          @click="submit">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -49,29 +101,36 @@ export default {
   name: 'EditForm',
   props: {
     title: String,
-    dataForm: {
-      type: Object,
-      default: () => {
-        return {
-          number: '',
-          name: '',
-          code: '',
-          remarks: '',
-          id: '',
-        };
-      },
-    },
   },
   data() {
     return {
       show: false,
       showbtn: false,
+      canSelectType: ['Active', 'Disabled'],
+      dialogVisible: false,
+      dialogImageUrl: '',
+      dataForm: {
+        parentId: null,
+        moduleName: '',
+        status: 'Disabled',
+        icon: null,
+        previewDiagram: '',
+        description: '',
+        config: {
+          PROPS: [],
+          PROCESS: [],
+        },
+        childNode: null,
+      },
+      lists: [{ name: '' }],
     };
   },
+  watch: {},
   created() {},
   mounted() {},
   methods: {
-    open() {
+    open(data) {
+      this.dataForm = { ...this.dataForm, ...data };
       this.show = !this.show;
       this.$nextTick(() => {
         this.$refs.dataForm.clearValidate();
@@ -82,12 +141,53 @@ export default {
         callback(valid);
       });
     },
-    submit(dataForm) {
-      this.$emit('submit', dataForm);
+    submit() {
+      this.$emit('submit', this.dataForm);
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/svg';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 SVG 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      this.fileList = [];
+      return isJPG && isLt2M;
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    handleRemove(file, fileList) {
+      this.dataForm.icon = '';
+    },
+    changeFile(file, fileList) {
+      let reader = new FileReader();
+      reader.readAsDataURL(file.raw);
+      reader.onload = () => {
+        file.url = reader.result;
+        this.dataForm.icon = reader.result;
+      };
+    },
+    addInput() {
+      this.lists.push({ name: '' });
+    },
+    delInput(index) {
+      if (this.lists.length > 1) {
+        const list = [...this.lists];
+        list.splice(index, 1);
+        this.lists = [...list];
+      } else {
+        this.$message.warning('给我留点，不能再删了！');
+        return;
+      }
     },
   },
 };
 </script>
 
-<style  scoped>
+<style scoped>
 </style>

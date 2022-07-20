@@ -15,11 +15,11 @@ Vue.use(VueI18n)
 let lang =
     localStorage.getItem('lang') ||
     navigator.language ||
-    "zh-CN";
+    "en-US";
 
 const i18n = new VueI18n({
     locale: lang, // 语言标识
-    fallbackLocale: 'zh-CN',
+    fallbackLocale: 'en-US',
     messages: {
         "en-US": {...enLang, ...enLocale}, // 英文
         "zh-CN": {...zhLang, ...zhLocale}, // 简体中文

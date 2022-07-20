@@ -2,13 +2,14 @@
   <div>
     <header-buttons size="mini" type="primary" v-model="bpmnProp.zoom" v-if="bpmnProp.bpmn" :bpmn="bpmnProp.bpmn"
                     :processType="''+selectType.id"
-                    :min-zoom="0.1" :max-zoom="4" @newXml="importXML"/>
+                    :min-zoom="0.1" :max-zoom="4" @newXml="reInit"/>
     <div class="containers" ref="containers">
-      <div class="canvas" :ref="bpmnProp.container" id="canvas"></div>
+      <div class="canvas" :ref="bpmnProp.container" id="canvas" tabIndex="-1"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
       <right-menu @toggleFlow="reSelectChildren" :panel-types="selectType" :elements="selectElements"
                   :bpmn="bpmnProp.bpmn"
-                  @changeField="changeField"/>
+      />
+      <!--      @changeField="changeField"-->
     </div>
     <select-type-panel ref="typeSelect" @onSelect="typeSelect"
                        :default-visible="selectTypePanelDefaultVisible" :canRef="protect"
@@ -29,6 +30,10 @@ import HeaderButtons from './tools/HeaderButtons';
 import RightMenu from './tools/rightMenu.vue';
 import SelectTypePanel from './tools/SelectTypePanel';
 /**
+ * ToolsJs
+ */
+import {is as modelIs} from 'bpmn-js/lib/util/ModelUtil';
+/**
  * Bpmn And Bpmn Extend
  */
 import BpmnModeler from 'bpmn-js/lib/Modeler';
@@ -40,6 +45,7 @@ import {
 } from '@/components/bpmn/prefabrication';
 import BpmnColorPickerModule from 'bpmn-js-color-picker';
 import camundaModdleDescriptor from 'camunda-bpmn-moddle/resources/camunda';
+import ResizeAllRules from "@/components/bpmn/prefabrication/resize-all-rules";
 
 export default {
   name: 'bpmn',
@@ -54,7 +60,7 @@ export default {
         },
         imperfect: {
           fill: null,
-          stroke: 'rgb(255,255,55)',
+          stroke: 'rgb(182,182,0)',
         },
         unCheck: {
           fill: null,
@@ -67,6 +73,10 @@ export default {
         error: {
           fill: 'rgb(255,0,0)',
           stroke: 'rgb(0,0,0)',
+        },
+        default: {
+          fill: null,
+          stroke: null,
         },
       },
 
@@ -91,6 +101,9 @@ export default {
           canvas: null,
         },
       },
+      cache: {
+        xml: null, conf: null, id: null
+      },
     };
   },
   created() {
@@ -99,6 +112,7 @@ export default {
     this.$refs['typeSelect'].open();
   },
   methods: {
+    is: modelIs,
     typeSelect(selectType, xml, id) {
       if (this.protect) {
         if (!id) {
@@ -121,24 +135,38 @@ export default {
       this.typeSelect(selectType, xml, id);
     },
 
+    reInit(xml, conf, id) {
+      if (!xml) {
+        xml = this.cache.xml
+      }
+      if (!conf) {
+        conf = this.cache.conf
+      }
+      if (!id) {
+        id = this.cache.id
+      }
+      this.init(xml, conf, id);
+    },
     /**
      * 初始化Bpmn图
      * @param xml
      * @param conf
+     * @param id
      */
     init(xml, conf, id) {
+      this.cache = {xml, conf, id}
       let props = this.bpmnProp;
       let that = this;
-
+      let container = that.$refs[props.container]
       if (props.bpmn) {
         props.bpmn.destroy();
       }
-      console.log(this)
       props.bpmn = new BpmnModeler({
-        container: that.$refs[props.container],
-        keyboard: props.keyboard ?? {bindTo: document},
+        container: container,
+        keyboard: props.keyboard ?? {bindTo: container},
         additionalModules: [
           BpmnColorPickerModule,
+          ResizeAllRules,
           PrefabricationTranslateModule,
           PrefabricationPaletteModule,
           PrefabricationReaderModule,
@@ -168,15 +196,17 @@ export default {
       }
       if (xml) {
         await bpmn.importXML(xml).then(() => {
-          bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {id: id, isExecutable: true,
-            name: 'New'+ id,});
+          bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {
+            id: id, isExecutable: true,
+            name: 'New' + id,
+          });
         });
       } else {
         if (bpmn.createDiagram) {
           await bpmn.createDiagram().then(() => {
             bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {
               id: id,
-              name: 'New'+ id,
+              name: 'New' + id,
               isExecutable: true
             });
           });
@@ -201,17 +231,16 @@ export default {
 
       props.modules.eventBus.on("element.updateProperties", (element) => {
         // 数据更新后
-
         let newValue = this.selectElements;
         this.selectElements = [];
         this.selectElements = newValue;
+        this.changeField(element);
       });
 
       props.modules.eventBus.on('selection.changed', (event) => {
         this.selectElements = event.newSelection.length
             ? event.newSelection
             : this.bpmnProp.modules.canvas.getRootElements();
-        console.log(this.selectElements)
       });
 
       props.modules.eventBus.on('connection.changed', ({element}) => {
@@ -244,7 +273,7 @@ export default {
                     '条件仅可使用“是”，“否”两个分支'
                 )
             );
-          } else if (target.type.includes('Gateway')) {
+          } else if (target === source) {
             this.removeCollection(
                 element,
                 this.$createElement(
@@ -346,23 +375,31 @@ export default {
      */
     synchronousCondition(first, second) {
       if (first && second) {
-        let firstName = first.businessObject.name;
-        let secondName = second.businessObject.name;
-        if ((firstName ? (firstName == 'true' ? 'false' : 'true') : null) != secondName) {
-          if (firstName) {
+        let firstName = first.businessObject.get('option');
+        let secondName = second.businessObject.get('option');
+        if ((!secondName) !== firstName) {
+          if (firstName === true || firstName === false) {
             this.bpmnProp.modules.modeling.updateProperties(second, {
-              name: firstName == 'true' ? 'false' : 'true',
+              name: !firstName + '',
+              option: !firstName,
             });
           } else if (secondName) {
             this.bpmnProp.modules.modeling.updateProperties(first, {
-              name: secondName == 'true' ? 'false' : 'true',
+              name: !second + '',
+              option: !second,
             });
           }
         }
-      } else if (!first.businessObject.name) {
-        this.bpmnProp.modules.modeling.updateProperties(first, {
-          name: 'true',
-        });
+      } else {
+        if (!first.businessObject.name) {
+          this.bpmnProp.modules.modeling.updateProperties(first, {
+            name: 'true',
+            option: true,
+          });
+          this.bpmnProp.modules.modeling.updateProperties((first || second).source, {
+            default: (first || second)
+          })
+        }
       }
     },
 
@@ -450,14 +487,20 @@ export default {
      * @param event
      * @param type
      */
-    changeField(element, type) {
-      if(element.type === 'bpmn:Process'){
+    changeField(element) {
+      console.log('aaa')
+      if (element.type === 'bpmn:Process') {
         return;
       }
+
       let isImperfect = false;
       let isUnSave = false;
-      let isUnCheck = true;
-      let isSuccess = true;
+      let isUnCheck = false;
+      let isSuccess = false;
+      // 完整性
+      if (!element.businessObject.get("name")) {
+        isImperfect = true;
+      }
       if (isImperfect) {
         this.changeColor(this.elementColorEnum.imperfect, element);
       } else if (isUnSave) {
@@ -466,6 +509,8 @@ export default {
         this.changeColor(this.elementColorEnum.unCheck, element);
       } else if (isSuccess) {
         this.changeColor(this.elementColorEnum.complete, element);
+      } else {
+        this.changeColor(this.elementColorEnum.default, element);
       }
     },
 
@@ -485,6 +530,7 @@ export default {
   position: relative;
 
   .canvas {
+    outline: none;
     background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+') repeat !important;
     height: 100%;
   }
