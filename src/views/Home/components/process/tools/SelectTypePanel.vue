@@ -75,7 +75,7 @@
                   <el-col :span="6">模</el-col>
                   <el-col :span="6">块</el-col>
                   <el-col :span="6">名</el-col>
-                  <el-col :span="6">称 :</el-col>
+                  <el-col :span="6">称:</el-col>
                 </el-row>
               </el-col>
               <el-col :span="17">{{ planType.moduleName ? (planType.moduleName) : '' }}</el-col>
@@ -86,7 +86,7 @@
                   <el-col :span="6">描</el-col>
                   <el-col :span="6">述</el-col>
                   <el-col :span="6">内</el-col>
-                  <el-col :span="6">容 :</el-col>
+                  <el-col :span="6">容:</el-col>
                 </el-row>
               </el-col>
               <el-col :span="17">{{ planType.description ? (planType.description) : '' }}</el-col>
