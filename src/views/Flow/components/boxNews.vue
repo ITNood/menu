@@ -51,14 +51,17 @@
           title="上一个"
           circle
           size="mini"></el-button>
-        <el-button :icon="play?'el-icon-video-play':'el-icon-video-pause'"
-          :title="play?'播放':'暂停'"
+
+        <el-button :icon="play ? 'el-icon-video-play':'el-icon-video-pause'"
+          :title="play ? '播放':'暂停'"
           @click="player"
           circle></el-button>
+
         <el-button icon="el-icon-refresh-right"
           @click="reset"
           title="重置"
           circle></el-button>
+
         <el-button icon="el-icon-right"
           title="下一个"
           @click="next"
@@ -114,7 +117,6 @@ export default {
     exportJson() {
       saveJSON(this.data, '数据');
     },
-
     prev() {
       this.$emit('prev');
     },
