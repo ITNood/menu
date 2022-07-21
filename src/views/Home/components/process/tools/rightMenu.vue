@@ -290,7 +290,7 @@ export default {
       let properties = {};
       type.forEach((i) => properties[i] = (i === 'name' ? (event + '') : event));
       this.bpmn.get('modeling').updateProperties(elements || this.thisElements[this.selectIndex], properties);
-      // this.$emit('changeField', this.thisElements[this.selectIndex]);
+      this.$emit('changeField', this.thisElements[this.selectIndex]);
       this.flushElements(this.elements);
     },
     //折叠

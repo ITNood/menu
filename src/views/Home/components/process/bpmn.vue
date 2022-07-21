@@ -7,9 +7,8 @@
       <div class="canvas" :ref="bpmnProp.container" id="canvas" tabIndex="-1"></div>
       <div class="properties-panel-parent" id="js-properties-panel"></div>
       <right-menu @toggleFlow="reSelectChildren" :panel-types="selectType" :elements="selectElements"
-                  :bpmn="bpmnProp.bpmn"
+                  :bpmn="bpmnProp.bpmn" @changeField="changeField"
       />
-      <!--      @changeField="changeField"-->
     </div>
     <select-type-panel ref="typeSelect" @onSelect="typeSelect"
                        :default-visible="selectTypePanelDefaultVisible" :canRef="protect"
@@ -194,22 +193,21 @@ export default {
       if (!id) {
         id = this.createNewProcessId();
       }
-      if (xml) {
-        await bpmn.importXML(xml).then(() => {
-          bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {
-            id: id, isExecutable: true,
+      let refreshProp = () => {
+        bpmn.get('commandStack')._getHandler("element.updateProperties").execute({
+          element: bpmn.get('canvas').getRootElements()[0],
+          properties: {
+            id: id,
+            isExecutable: true,
             name: 'New' + id,
-          });
-        });
+          }
+        })
+      }
+      if (xml) {
+        await bpmn.importXML(xml).then(refreshProp);
       } else {
         if (bpmn.createDiagram) {
-          await bpmn.createDiagram().then(() => {
-            bpmn.get('modeling').updateProperties(bpmn.get('canvas').getRootElements()[0], {
-              id: id,
-              name: 'New' + id,
-              isExecutable: true
-            });
-          });
+          await bpmn.createDiagram().then(refreshProp);
         }
       }
     },
@@ -234,7 +232,6 @@ export default {
         let newValue = this.selectElements;
         this.selectElements = [];
         this.selectElements = newValue;
-        this.changeField(element);
       });
 
       props.modules.eventBus.on('selection.changed', (event) => {
@@ -484,21 +481,18 @@ export default {
 
     /**
      * 修改元素的属性
-     * @param event
-     * @param type
+     * @param element
      */
     changeField(element) {
-      console.log('aaa')
       if (element.type === 'bpmn:Process') {
         return;
       }
-
       let isImperfect = false;
       let isUnSave = false;
       let isUnCheck = false;
       let isSuccess = false;
       // 完整性
-      if (!element.businessObject.get("name")) {
+      if (element && element.businessObject && (!element.businessObject.get('name'))) {
         isImperfect = true;
       }
       if (isImperfect) {
