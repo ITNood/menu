@@ -20,11 +20,12 @@
     </el-button>
 
     <el-table :data="tableData"
+              ref="table"
               :row-class-name="({row})=>row.status == 'Deleted'?'warning-row':''"
               id="dataForm" row-key="id"
               @selection-change="handleSelectionChange"
               style="margin-top:15px"
-              lazy :load="(tree, treeNode, resolve)=>$emit('load',tree,treeNode,resolve)"
+              lazy :load="(tree, treeNode, resolve)=>$emit('load',tree,resolve)"
               :tree-props="{children: 'childNode'}"
               border>
       <el-table-column type="selection" width="55"></el-table-column>
@@ -123,6 +124,10 @@ export default {
       this.$emit('selectChange', [row]);
       this.$emit('del');
     },
+    reloadParent(nowElement){
+      console.log(nowElement)
+      this.$emit('reLoad',{id:nowElement.parentId},(data)=>this.$refs.table.layout.store.states.lazyTreeNodeMap[nowElement.parentId] = data)
+    }
   },
 };
 </script>

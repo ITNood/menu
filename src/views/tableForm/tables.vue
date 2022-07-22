@@ -1,22 +1,24 @@
 <template>
   <div>
     <search :form="form"
-      @search="search" />
+            @search="search"/>
     <Table-form :tableData="data"
-      :multipleSelection="multipleSelection"
-      @load="(tree, treeNode, resolve)=>{getMenu(tree.id).then((data)=>resolve(data))}"
-      @selectChange="selectChange"
-      @del="del"
-      @add="add"
-      @edit="edit" />
+                ref="table"
+                :multipleSelection="multipleSelection"
+                @load="(tree, resolve)=>{getMenu(tree.id).then((response)=>resolve(response))}"
+                @reLoad="(tree, resolve)=>{getMenu(tree.id).then((response)=>resolve(response))}"
+                @selectChange="selectChange"
+                @del="del"
+                @add="add"
+                @edit="edit"/>
     <Pagenation :activePage="page"
-      :total="total"
-      :pageSize="pageSize"
-      @pageSizeChange="pageSizeChange"
-      @avtivePageChange="avtivePageChange" />
+                :total="total"
+                :pageSize="pageSize"
+                @pageSizeChange="pageSizeChange"
+                @avtivePageChange="avtivePageChange"/>
     <edit-form ref="child"
-      :title="title"
-      @submit="submit" />
+               :title="title"
+               @submit="submit"/>
   </div>
 </template>
 
@@ -25,15 +27,10 @@ import Search from './components/search';
 import TableForm from './components/table';
 import Pagenation from '../../components/page/pagenation';
 import EditForm from './components/editForm';
-import {
-  deleteMenu,
-  getMenu as getMenuJs,
-  insertMenu,
-  updateMenu,
-} from '@/api/process/menu';
+import {deleteMenu, getMenu as getMenuJs, insertMenu, updateMenu,} from '@/api/process/menu';
 
 export default {
-  components: { Search, TableForm, Pagenation, EditForm },
+  components: {Search, TableForm, Pagenation, EditForm},
   data() {
     return {
       form: {
@@ -53,7 +50,8 @@ export default {
       this.data = data;
     });
   },
-  mounted() {},
+  mounted() {
+  },
   methods: {
     getMenu: (id) => {
       return getMenuJs(id).then((response) => {
@@ -65,7 +63,8 @@ export default {
         return response.data;
       });
     },
-    search() {},
+    search() {
+    },
     //删除
     del() {
       if (this.multipleSelection.length > 0) {
@@ -74,26 +73,26 @@ export default {
           cancelButtonText: '取消',
           type: 'warning',
         })
-          .then(() => {
-            const ids = [];
-            this.multipleSelection.map((e) => {
-              ids.push(e.id);
+            .then(() => {
+              const ids = [];
+              this.multipleSelection.map((e) => {
+                ids.push(e.id);
+              });
+              deleteMenu(ids).then((response) => {
+                if (response.code === 200) {
+                  this.$message.success('删除成功');
+                }
+              });
+            })
+            .catch(() => {
+              this.$message.info('取消了删除');
             });
-            deleteMenu(ids).then((response) => {
-              if (response.code === 200) {
-                this.$message.success('删除成功');
-              }
-            });
-          })
-          .catch(() => {
-            this.$message.info('取消了删除');
-          });
       } else {
         this.$message.error('请选择要删除的数据');
       }
     },
     //新增
-    add(row) {
+    add() {
       this.$refs.child.open();
       this.title = '新增';
     },
@@ -120,17 +119,20 @@ export default {
           if (!data.id) {
             //验证通过
             insertMenu(data).then((res) => {
-              if (res.code == 200) {
+              if (res.code === 200) {
                 this.$message.success('保存成功');
                 this.$refs.child.show = false;
+                console.log(this.$refs.table)
+                this.$refs.table.reloadParent(data)
               }
             });
           } else {
             //验证通过
             updateMenu(data).then((res) => {
-              if (res.code == 200) {
+              if (res.code === 200) {
                 this.$message.success('保存成功');
                 this.$refs.child.show = false;
+                this.$refs.table.reloadParent(data)
               }
             });
           }
